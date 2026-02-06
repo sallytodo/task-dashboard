@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Task Dashboard — Sally Williams</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --rose: #e8638b;
+    --rose-dark: #d4507a;
+    --rose-light: #fce4ec;
+    --blush: #f9f1f4;
+    --mauve: #b07aab;
+    --mauve-light: #f3eaf2;
+    --plum: #7c5295;
+    --sage: #7eb8a2;
+    --sage-light: #e8f5ef;
+    --peach: #f4a261;
+    --peach-light: #fef0e1;
+    --lavender: #a78bca;
+    --lavender-light: #f0eaf7;
+    --cream: #fdfbf9;
+    --warm-white: #fff9f7;
+    --text: #4a3f4f;
+    --text-light: #8a7f8e;
+    --text-muted: #b5adb8;
+    --border: #ecdfe8;
+    --border-light: #f5eef3;
+  }
+
+  body {
+    font-family: 'DM Sans', 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: linear-gradient(160deg, #fdf6f9 0%, #f5eef8 40%, #eef3fb 100%);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ─── Top bar ─── */
+  .topbar {
+    background: linear-gradient(135deg, #d4507a 0%, #b07aab 50%, #8b6bbd 100%);
+    padding: 22px 36px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 24px rgba(212,80,122,0.18);
+  }
+
+  .topbar h1 {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -0.2px;
+  }
+
+  .topbar p {
+    color: rgba(255,255,255,0.7);
+    font-size: 0.82rem;
+    margin-top: 3px;
+    font-weight: 400;
+  }
+
+  .add-btn {
+    padding: 10px 26px;
+    border-radius: 50px;
+    border: none;
+    background: rgba(255,255,255,0.22);
+    color: #fff;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.25s;
+    letter-spacing: 0.2px;
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255,255,255,0.3);
+  }
+
+  .add-btn:hover { background: rgba(255,255,255,0.35); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
+  .add-btn:active { transform: translateY(0); }
+
+  /* ─── Main content ─── */
+  .main {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 28px 36px;
+  }
+
+  /* ─── Thursday banner ─── */
+  .thursday-banner {
+    background: linear-gradient(135deg, #f4a261 0%, #f9c97b 100%);
+    border-radius: 14px;
+    padding: 14px 22px;
+    font-size: 0.85rem;
+    color: #5a3600;
+    margin-bottom: 22px;
+    display: none;
+    font-weight: 500;
+    border: 1px solid rgba(244,162,97,0.3);
+    box-shadow: 0 2px 12px rgba(244,162,97,0.15);
+  }
+
+  .thursday-banner strong { color: #3e2200; }
+
+  /* ─── Progress section ─── */
+  .progress-section {
+    background: var(--warm-white);
+    border-radius: 16px;
+    padding: 22px 28px;
+    margin-bottom: 22px;
+    border: 1px solid var(--border);
+    box-shadow: 0 2px 12px rgba(180,140,170,0.06);
+  }
+
+  .progress-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+
+  .progress-header span {
+    font-size: 0.82rem;
+    color: var(--text-light);
+    font-weight: 600;
+  }
+
+  .progress-bar {
+    width: 100%;
+    height: 8px;
+    background: var(--border-light);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--rose), var(--mauve), var(--lavender));
+    border-radius: 8px;
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .stats {
+    display: flex;
+    gap: 28px;
+    margin-top: 14px;
+  }
+
+  .stat {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.8rem;
+    color: var(--text-light);
+    font-weight: 500;
+  }
+
+  .stat-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .stat-dot.todo { background: var(--rose); }
+  .stat-dot.done { background: var(--sage); }
+  .stat-dot.waiting { background: var(--peach); }
+
+  /* ─── Filters ─── */
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 22px;
+  }
+
+  .filter-group {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .filter-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-right: 4px;
+  }
+
+  .filter-btn {
+    padding: 6px 16px;
+    border-radius: 50px;
+    border: 1px solid var(--border);
+    background: var(--warm-white);
+    font-size: 0.78rem;
+    cursor: pointer;
+    color: var(--text);
+    transition: all 0.2s;
+    font-family: inherit;
+    font-weight: 500;
+  }
+
+  .filter-btn:hover { background: var(--blush); border-color: var(--rose-light); }
+
+  .filter-btn.active {
+    background: linear-gradient(135deg, var(--rose), var(--mauve));
+    color: #fff;
+    border-color: transparent;
+    box-shadow: 0 2px 8px rgba(212,80,122,0.25);
+  }
+
+  .filter-separator {
+    width: 1px;
+    height: 22px;
+    background: var(--border);
+    margin: 0 8px;
+  }
+
+  /* ─── Task grid ─── */
+  .task-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 14px;
+  }
+
+  /* ─── Task card ─── */
+  .task-card {
+    background: var(--warm-white);
+    border-radius: 14px;
+    padding: 0;
+    border: 1px solid var(--border);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    cursor: default;
+  }
+
+  .task-card:hover {
+    box-shadow: 0 8px 28px rgba(180,120,170,0.12);
+    transform: translateY(-2px);
+    border-color: rgba(176,122,171,0.3);
+  }
+
+  .card-color-bar {
+    height: 4px;
+    width: 100%;
+  }
+
+  .card-color-bar.energy-high { background: linear-gradient(90deg, #e8638b, #d4507a); }
+  .card-color-bar.energy-medium { background: linear-gradient(90deg, #f4a261, #e8975a); }
+  .card-color-bar.energy-low { background: linear-gradient(90deg, #7eb8a2, #6bab94); }
+  .card-color-bar.energy- { background: linear-gradient(90deg, #c9bfcc, #b5adb8); }
+
+  .card-body {
+    padding: 16px 18px 14px;
+  }
+
+  .card-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .task-name {
+    font-size: 0.9rem;
+    font-weight: 600;
+    line-height: 1.4;
+    color: var(--text);
+    cursor: pointer;
+    flex: 1;
+    transition: color 0.2s;
+  }
+
+  .task-name:hover { color: var(--rose); }
+
+  .status-pill {
+    padding: 4px 14px;
+    border-radius: 50px;
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    border: none;
+    color: #fff;
+    white-space: nowrap;
+    transition: all 0.2s;
+    font-family: inherit;
+    flex-shrink: 0;
+  }
+
+  .status-pill:hover { opacity: 0.85; transform: scale(1.05); }
+
+  .status-pill.todo { background: linear-gradient(135deg, #4a3d5c, #5c4e6b); }
+  .status-pill.done { background: linear-gradient(135deg, var(--sage), #6bab94); }
+  .status-pill.waiting { background: linear-gradient(135deg, var(--peach), #e8975a); }
+
+  .card-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    align-items: center;
+  }
+
+  .tag {
+    padding: 3px 10px;
+    border-radius: 50px;
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+  }
+
+  .tag-area {
+    background: var(--lavender-light);
+    color: var(--plum);
+  }
+
+  .tag-energy-high { background: var(--rose-light); color: var(--rose-dark); }
+  .tag-energy-medium { background: var(--peach-light); color: #c07830; }
+  .tag-energy-low { background: var(--sage-light); color: #4a8a6f; }
+
+  .tag-due { background: #fef5ea; color: #a06020; }
+  .tag-recurring { background: var(--mauve-light); color: var(--mauve); }
+  .tag-notes { background: var(--border-light); color: var(--text-light); }
+  .tag-added { background: #f8f5f6; color: var(--text-muted); font-weight: 500; }
+
+  .task-card.type-work {
+    background: linear-gradient(145deg, #fff9fb 0%, #fdf2f6 100%);
+    border-color: #f0d6e0;
+  }
+
+  .task-card.type-personal {
+    background: linear-gradient(145deg, #f9f5fe 0%, #f3edfb 100%);
+    border-color: #e2d4f0;
+  }
+
+  .task-card.status-done {
+    opacity: 0.5;
+  }
+
+  .task-card.status-done .task-name {
+    text-decoration: line-through;
+    color: var(--text-muted);
+  }
+
+  .task-card.thursday-highlight {
+    border-color: var(--peach);
+    box-shadow: 0 0 0 2px rgba(244,162,97,0.25);
+  }
+
+  .no-tasks {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 60px 24px;
+    color: var(--text-muted);
+    font-size: 0.92rem;
+  }
+
+  /* ─── Modal ─── */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(80,50,70,0.35);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(4px);
+  }
+
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: var(--warm-white);
+    border-radius: 18px;
+    padding: 30px 34px;
+    width: 480px;
+    max-width: 94vw;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 24px 80px rgba(120,70,100,0.2);
+    border: 1px solid var(--border);
+  }
+
+  .modal h2 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin-bottom: 22px;
+    color: var(--text);
+  }
+
+  .form-field { margin-bottom: 16px; }
+
+  .form-field label {
+    display: block;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--text-light);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    margin-bottom: 6px;
+  }
+
+  .form-field input,
+  .form-field select,
+  .form-field textarea {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-size: 0.88rem;
+    font-family: inherit;
+    color: var(--text);
+    background: #fff;
+    transition: border-color 0.25s, box-shadow 0.25s;
+  }
+
+  .form-field input:focus,
+  .form-field select:focus,
+  .form-field textarea:focus {
+    outline: none;
+    border-color: var(--rose);
+    box-shadow: 0 0 0 3px rgba(232,99,139,0.1);
+  }
+
+  .form-field textarea {
+    min-height: 80px;
+    resize: vertical;
+    line-height: 1.5;
+  }
+
+  .form-field-row { display: flex; gap: 12px; }
+  .form-field-row .form-field { flex: 1; }
+
+  .new-area-input { margin-top: 6px; }
+
+  .form-check {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .form-check input[type="checkbox"] {
+    width: 17px;
+    height: 17px;
+    accent-color: var(--rose);
+  }
+
+  .form-check label {
+    font-size: 0.85rem;
+    color: var(--text);
+    cursor: pointer;
+    font-weight: 500;
+  }
+
+  .modal-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 24px;
+    padding-top: 18px;
+    border-top: 1px solid var(--border-light);
+  }
+
+  .modal-actions button {
+    padding: 10px 24px;
+    border-radius: 50px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+  }
+
+  .btn-cancel {
+    border: 1px solid var(--border);
+    background: #fff;
+    color: var(--text-light);
+  }
+
+  .btn-cancel:hover { background: var(--blush); }
+
+  .btn-save {
+    border: none;
+    background: linear-gradient(135deg, var(--rose), var(--mauve));
+    color: #fff;
+    box-shadow: 0 2px 10px rgba(212,80,122,0.25);
+  }
+
+  .btn-save:hover { box-shadow: 0 4px 16px rgba(212,80,122,0.35); transform: translateY(-1px); }
+
+  .btn-delete {
+    border: 1px solid var(--rose-light);
+    background: #fff;
+    color: var(--rose);
+    margin-right: auto;
+  }
+
+  .btn-delete:hover { background: var(--rose-light); }
+
+  /* ─── Responsive ─── */
+  @media (max-width: 640px) {
+    .main { padding: 16px; }
+    .topbar { padding: 16px 18px; }
+    .task-grid { grid-template-columns: 1fr; }
+    .filters { gap: 6px; }
+    .stats { flex-wrap: wrap; gap: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div>
+    <h1>Sally's Dashboard</h1>
+    <p>Money Means &middot; Chief of Staff</p>
+  </div>
+  <button class="add-btn" onclick="openModal()">+ New Task</button>
+</div>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <h2 id="modalTitle">New Task</h2>
+    <div class="form-field">
+      <label for="taskName">Task name</label>
+      <input type="text" id="taskName" placeholder="e.g. Chase Helena re: budget sign-off">
+    </div>
+    <div class="form-field-row">
+      <div class="form-field">
+        <label for="taskType">Type</label>
+        <select id="taskType">
+          <option value="Work" selected>Work</option>
+          <option value="Personal">Personal</option>
+        </select>
+      </div>
+      <div class="form-field">
+        <label for="taskArea">Category</label>
+        <select id="taskArea" onchange="handleAreaChange()"></select>
+        <input type="text" id="taskAreaNew" class="new-area-input" placeholder="Type new category name" style="display:none">
+      </div>
+      <div class="form-field">
+        <label for="taskEnergy">Energy</label>
+        <select id="taskEnergy">
+          <option value="High">High</option>
+          <option value="Medium" selected>Medium</option>
+          <option value="Low">Low</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-field-row">
+      <div class="form-field">
+        <label for="taskStatus">Status</label>
+        <select id="taskStatus">
+          <option value="To Do" selected>To Do</option>
+          <option value="Done">Done</option>
+          <option value="Waiting">Waiting</option>
+        </select>
+      </div>
+      <div class="form-field">
+        <label for="taskDue">Due date</label>
+        <input type="date" id="taskDue">
+      </div>
+    </div>
+    <div class="form-check">
+      <input type="checkbox" id="taskRecurring">
+      <label for="taskRecurring">Recurring task</label>
+    </div>
+    <div class="form-field">
+      <label for="taskNotes">Notes</label>
+      <textarea id="taskNotes" placeholder="Add any notes..."></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-delete" id="btnDelete" onclick="deleteTask()" style="display:none">Delete</button>
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-save" id="btnSave" onclick="saveTask()">Add Task</button>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+
+<div class="thursday-banner" id="thursdayBanner">
+  <strong>Thursday tasks:</strong> Invoice payments and Expenses are due today (every other Thursday for expenses).
+</div>
+
+<div class="progress-section">
+  <div class="progress-header">
+    <span>Progress</span>
+    <span id="progressText">0 / 0 done</span>
+  </div>
+  <div class="progress-bar">
+    <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+  </div>
+  <div class="stats">
+    <div class="stat"><span class="stat-dot todo"></span><span id="statTodo">0 to do</span></div>
+    <div class="stat"><span class="stat-dot done"></span><span id="statDone">0 done</span></div>
+    <div class="stat"><span class="stat-dot waiting"></span><span id="statWaiting">0 waiting</span></div>
+  </div>
+</div>
+
+<div class="filters" id="filters"></div>
+
+<div class="task-grid" id="taskGrid"></div>
+
+</div>
+
+<script>
+// ─── TASK DATA ───────────────────────────────────────────────────
+const tasks = [
+  { id: 1,  name: "Decision frameworks 17\u201325 (9 remaining)", area: "Decision Frameworks", energy: "High", status: "To Do", type: "Work", due: "9th Feb 2026", added: "5th Feb 2026", notes: "" },
+  { id: 2,  name: "Catch-up with Syreeta \u2014 kick off handover notes", area: "Syreeta Transition", energy: "High", status: "To Do", type: "Work", due: "9th Feb 2026", added: "5th Feb 2026", notes: "" },
+  { id: 3,  name: "Design team meeting \u2014 testing", area: "Ongoing", energy: "High", status: "To Do", type: "Work", due: "9th Feb 2026", added: "5th Feb 2026", notes: "" },
+  { id: 4,  name: "Frank meeting \u2014 knowledge base discussion", area: "Ongoing", energy: "High", status: "To Do", type: "Work", due: "9th Feb 2026", added: "5th Feb 2026", notes: "" },
+  { id: 5,  name: "Deliver message re: earlier finish date", area: "Syreeta Transition", energy: "Medium", status: "To Do", type: "Work", due: "9th Feb 2026", added: "5th Feb 2026", notes: "" },
+  { id: 6,  name: "Check re: automatic feedback email", area: "Syreeta Transition", energy: "Medium", status: "To Do", type: "Work", due: "9th Feb 2026", added: "5th Feb 2026", notes: "" },
+  { id: 7,  name: "Ask her to draft handover list", area: "Syreeta Transition", energy: "Medium", status: "To Do", type: "Work", due: "9th Feb 2026", added: "5th Feb 2026", notes: "" },
+  { id: 8,  name: "Notion tidy up", area: "Ongoing", energy: "Medium", status: "To Do", type: "Work", due: "9th Feb 2026", added: "5th Feb 2026", notes: "" },
+  { id: 9,  name: "Ideas for improving remote working", area: "Ongoing", energy: "Medium", status: "To Do", type: "Work", due: "9th Feb 2026", added: "5th Feb 2026", notes: "" },
+  { id: 10, name: "Explore Claude projects for automating socials/waitlist", area: "Ongoing", energy: "Medium", status: "To Do", type: "Work", due: "9th Feb 2026", added: "5th Feb 2026", notes: "" },
+  { id: 11, name: "Book exit interview", area: "Syreeta Transition", energy: "Low", status: "To Do", type: "Work", due: "9th Feb 2026", added: "5th Feb 2026", notes: "" },
+  { id: 12, name: "Expenses", area: "Ongoing", energy: "Low", status: "To Do", type: "Work", recurring: true, thursdayTask: true, due: "9th Feb 2026", added: "5th Feb 2026", notes: "" },
+  { id: 13, name: "Invoice payments", area: "Finance", energy: "Low", status: "To Do", type: "Work", recurring: true, thursdayTask: true, due: "9th Feb 2026", added: "5th Feb 2026", notes: "" },
+  { id: 14, name: "Payroll", area: "Finance", energy: "Low", status: "To Do", type: "Work", recurring: true, due: "9th Feb 2026", added: "5th Feb 2026", notes: "" },
+  { id: 15, name: "Accountant documents", area: "Finance", energy: "Low", status: "To Do", type: "Work", recurring: true, due: "9th Feb 2026", added: "5th Feb 2026", notes: "" },
+  { id: 16, name: "Helena \u2014 team day decision", area: "Team Day", energy: "", status: "Waiting", type: "Work", due: "9th Feb 2026", added: "5th Feb 2026", notes: "" },
+  { id: 17, name: "David Osborne outreach", area: "Syreeta Transition", energy: "", status: "Done", type: "Work", due: "9th Feb 2026", added: "5th Feb 2026", notes: "" },
+  { id: 18, name: "Helena \u2014 weekly checkin", area: "Ongoing", energy: "Medium", status: "To Do", type: "Work", recurring: true, due: "9th Feb 2026", added: "5th Feb 2026", notes: "" },
+  { id: 24, name: "Book ski transfer", area: "Ongoing", energy: "Medium", status: "To Do", type: "Personal", added: "6th Feb 2026", notes: "" },
+  { id: 25, name: "Order under sink storage", area: "Ongoing", energy: "Medium", status: "To Do", type: "Personal", added: "6th Feb 2026", notes: "" },
+  { id: 26, name: "Start date", area: "Ongoing", type: "Work", energy: "Medium", status: "To Do", added: "6th Feb 2026", notes: "Reply to Ify re pre-employment tasks ahead of April start date." },
+  { id: 27, name: "Book holiday", area: "Ongoing", type: "Personal", energy: "Medium", status: "To Do", added: "6th Feb 2026", notes: "" },
+  { id: 28, name: "Pay Window Cleaner", area: "Ongoing", type: "Personal", energy: "Low", status: "To Do", added: "6th Feb 2026", notes: "" },
+  { id: 29, name: "Pay Tutor", area: "Ongoing", type: "Personal", energy: "Low", status: "To Do", added: "6th Feb 2026", notes: "" },
+  { id: 30, name: "Pay Stuart", area: "Ongoing", type: "Personal", energy: "Low", status: "To Do", added: "6th Feb 2026", notes: "£20" },
+  { id: 31, name: "AMEX card", area: "Ongoing", type: "Personal", energy: "Medium", status: "To Do", added: "6th Feb 2026", notes: "Set up Ben's card, cancel Sally's card" },
+  { id: 33, name: "Book ski lessons", area: "Ongoing", type: "Personal", energy: "Medium", status: "To Do", added: "6th Feb 2026", notes: "" },
+  { id: 34, name: "Book ski hire", area: "Ongoing", type: "Personal", energy: "Medium", status: "To Do", added: "6th Feb 2026", notes: "" },
+  { id: 35, name: "Book Majorca car hire", area: "Ongoing", type: "Personal", energy: "Medium", status: "To Do", added: "6th Feb 2026", notes: "" },
+];
+
+// ─── STATE ───────────────────────────────────────────────────────
+let activeFilters = { status: "All", energy: "All", area: "All", type: "All" };
+let editingTaskId = null;
+
+// ─── THURSDAY CHECK ──────────────────────────────────────────────
+const today = new Date();
+if (today.getDay() === 4) {
+  document.getElementById("thursdayBanner").style.display = "block";
+}
+
+// ─── BUILD FILTERS ───────────────────────────────────────────────
+function buildFilters() {
+  const container = document.getElementById("filters");
+  const areas = [...new Set(tasks.map(t => t.area))].sort();
+
+  const groups = [
+    { label: "Type", key: "type", options: ["All", "Work", "Personal"] },
+    { label: "Status", key: "status", options: ["All", "To Do", "Done", "Waiting"] },
+    { label: "Energy", key: "energy", options: ["All", "High", "Medium", "Low"] },
+    { label: "Category", key: "area", options: ["All", ...areas] },
+  ];
+
+  container.innerHTML = "";
+  groups.forEach((group, gi) => {
+    if (gi > 0) {
+      const sep = document.createElement("div");
+      sep.className = "filter-separator";
+      container.appendChild(sep);
+    }
+    const fg = document.createElement("div");
+    fg.className = "filter-group";
+    fg.innerHTML = '<span class="filter-label">' + group.label + '</span>';
+    group.options.forEach(opt => {
+      const btn = document.createElement("button");
+      btn.className = "filter-btn" + (activeFilters[group.key] === opt ? " active" : "");
+      btn.textContent = opt;
+      btn.addEventListener("click", () => {
+        activeFilters[group.key] = opt;
+        buildFilters();
+        render();
+      });
+      fg.appendChild(btn);
+    });
+    container.appendChild(fg);
+  });
+}
+
+// ─── STATUS CYCLE ────────────────────────────────────────────────
+const statusCycle = ["To Do", "Done", "Waiting"];
+function cycleStatus(task) {
+  const idx = statusCycle.indexOf(task.status);
+  task.status = statusCycle[(idx + 1) % statusCycle.length];
+  render();
+}
+
+// ─── RENDER ──────────────────────────────────────────────────────
+function render() {
+  const grid = document.getElementById("taskGrid");
+  const isThursday = today.getDay() === 4;
+
+  const filtered = tasks.filter(t => {
+    if (activeFilters.type !== "All" && (t.type || "Work") !== activeFilters.type) return false;
+    if (activeFilters.status !== "All" && t.status !== activeFilters.status) return false;
+    if (activeFilters.energy !== "All" && t.energy !== activeFilters.energy) return false;
+    if (activeFilters.area !== "All" && t.area !== activeFilters.area) return false;
+    return true;
+  });
+
+  // Stats
+  const todoCount = tasks.filter(t => t.status === "To Do").length;
+  const doneCount = tasks.filter(t => t.status === "Done").length;
+  const waitingCount = tasks.filter(t => t.status === "Waiting").length;
+  const total = tasks.length;
+  const pct = total > 0 ? Math.round((doneCount / total) * 100) : 0;
+
+  document.getElementById("progressFill").style.width = pct + "%";
+  document.getElementById("progressText").textContent = doneCount + " / " + total + " done (" + pct + "%)";
+  document.getElementById("statTodo").textContent = todoCount + " to do";
+  document.getElementById("statDone").textContent = doneCount + " done";
+  document.getElementById("statWaiting").textContent = waitingCount + " waiting";
+
+  if (filtered.length === 0) {
+    grid.innerHTML = '<div class="no-tasks">No tasks match these filters.</div>';
+    return;
+  }
+
+  grid.innerHTML = filtered.map(t => {
+    const eLower = t.energy ? t.energy.toLowerCase() : "";
+    const sLower = t.status.toLowerCase().replace(/ /g, "-");
+    const tLower = (t.type || "Work").toLowerCase();
+    const highlight = isThursday && t.thursdayTask ? " thursday-highlight" : "";
+
+    // Status pill
+    const statusClass = "status-pill " + sLower;
+    const statusLabel = t.status;
+
+    // Tags
+    let tags = '';
+    tags += '<span class="tag tag-area">' + escapeHtml(t.area) + '</span>';
+    if (t.energy) {
+      tags += '<span class="tag tag-energy-' + eLower + '">' + t.energy + '</span>';
+    }
+    if (t.due) {
+      tags += '<span class="tag tag-due">' + escapeHtml(t.due) + '</span>';
+    }
+    if (t.recurring) {
+      tags += '<span class="tag tag-recurring">Recurring</span>';
+    }
+    if (t.notes && t.notes.trim()) {
+      tags += '<span class="tag tag-notes">Notes</span>';
+    }
+
+    return '<div class="task-card status-' + sLower + ' type-' + tLower + highlight + '">' +
+      '<div class="card-color-bar energy-' + eLower + '"></div>' +
+      '<div class="card-body">' +
+        '<div class="card-top">' +
+          '<div class="task-name" data-edit-id="' + t.id + '">' + escapeHtml(t.name) + '</div>' +
+          '<button class="' + statusClass + '" data-id="' + t.id + '" title="Click to change status">' + statusLabel + '</button>' +
+        '</div>' +
+        '<div class="card-meta">' + tags + '</div>' +
+      '</div>' +
+      '</div>';
+  }).join("");
+
+  // Status pill handlers
+  grid.querySelectorAll(".status-pill").forEach(btn => {
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const id = parseInt(btn.getAttribute("data-id"));
+      const task = tasks.find(t => t.id === id);
+      if (task) { cycleStatus(task); buildFilters(); }
+    });
+  });
+
+  // Edit handlers
+  grid.querySelectorAll("[data-edit-id]").forEach(el => {
+    el.addEventListener("click", (e) => {
+      e.stopPropagation();
+      openEditModal(parseInt(el.getAttribute("data-edit-id")));
+    });
+  });
+}
+
+function escapeHtml(str) {
+  const div = document.createElement("div");
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+// ─── MODAL ───────────────────────────────────────────────────────
+function populateAreaDropdown(selectedArea) {
+  const sel = document.getElementById("taskArea");
+  const areas = [...new Set(tasks.map(t => t.area))].sort();
+  sel.innerHTML = areas.map(a => '<option value="' + escapeHtml(a) + '">' + escapeHtml(a) + '</option>').join("")
+    + '<option value="__new__">+ Add new category</option>';
+  if (selectedArea && areas.includes(selectedArea)) {
+    sel.value = selectedArea;
+  } else {
+    sel.value = "Ongoing";
+  }
+  document.getElementById("taskAreaNew").style.display = "none";
+  document.getElementById("taskAreaNew").value = "";
+}
+
+function openModal() {
+  editingTaskId = null;
+  document.getElementById("modalTitle").textContent = "New Task";
+  document.getElementById("btnSave").textContent = "Add Task";
+  document.getElementById("btnDelete").style.display = "none";
+  populateAreaDropdown("Ongoing");
+  document.getElementById("taskName").value = "";
+  document.getElementById("taskType").value = "Work";
+  document.getElementById("taskEnergy").value = "Medium";
+  document.getElementById("taskStatus").value = "To Do";
+  document.getElementById("taskDue").value = "";
+  document.getElementById("taskRecurring").checked = false;
+  document.getElementById("taskNotes").value = "";
+  document.getElementById("modalOverlay").classList.add("open");
+  document.getElementById("taskName").focus();
+}
+
+function openEditModal(id) {
+  const task = tasks.find(t => t.id === id);
+  if (!task) return;
+  editingTaskId = id;
+  document.getElementById("modalTitle").textContent = "Edit Task";
+  document.getElementById("btnSave").textContent = "Save Changes";
+  document.getElementById("btnDelete").style.display = "inline-block";
+  populateAreaDropdown(task.area);
+  document.getElementById("taskName").value = task.name;
+  document.getElementById("taskType").value = task.type || "Work";
+  document.getElementById("taskEnergy").value = task.energy || "Medium";
+  document.getElementById("taskStatus").value = task.status;
+  document.getElementById("taskDue").value = parseDateToInput(task.due);
+  document.getElementById("taskRecurring").checked = !!task.recurring;
+  document.getElementById("taskNotes").value = task.notes || "";
+  document.getElementById("modalOverlay").classList.add("open");
+  document.getElementById("taskName").focus();
+}
+
+function parseDateToInput(dateStr) {
+  if (!dateStr) return "";
+  const months = { Jan:"01", Feb:"02", Mar:"03", Apr:"04", May:"05", Jun:"06",
+                   Jul:"07", Aug:"08", Sep:"09", Oct:"10", Nov:"11", Dec:"12" };
+  const m = dateStr.match(/(\d+)\w*\s+(\w+)\s+(\d{4})/);
+  if (!m) return "";
+  return m[3] + "-" + (months[m[2]] || "01") + "-" + m[1].padStart(2, "0");
+}
+
+function handleAreaChange() {
+  const sel = document.getElementById("taskArea");
+  const newInput = document.getElementById("taskAreaNew");
+  if (sel.value === "__new__") { newInput.style.display = "block"; newInput.focus(); }
+  else { newInput.style.display = "none"; newInput.value = ""; }
+}
+
+function closeModal() {
+  document.getElementById("modalOverlay").classList.remove("open");
+  editingTaskId = null;
+}
+
+function formatTodayDate() {
+  const d = new Date();
+  const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const day = d.getDate();
+  const s = (day===1||day===21||day===31)?"st":(day===2||day===22)?"nd":(day===3||day===23)?"rd":"th";
+  return day + s + " " + months[d.getMonth()] + " " + d.getFullYear();
+}
+
+function formatDateValue(dateStr) {
+  if (!dateStr) return "";
+  const d = new Date(dateStr + "T00:00:00");
+  const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const day = d.getDate();
+  const s = (day===1||day===21||day===31)?"st":(day===2||day===22)?"nd":(day===3||day===23)?"rd":"th";
+  return day + s + " " + months[d.getMonth()] + " " + d.getFullYear();
+}
+
+function getFormArea() {
+  const v = document.getElementById("taskArea").value;
+  if (v === "__new__") {
+    const n = document.getElementById("taskAreaNew").value.trim();
+    if (!n) { document.getElementById("taskAreaNew").focus(); return null; }
+    return n;
+  }
+  return v;
+}
+
+function saveTask() {
+  const name = document.getElementById("taskName").value.trim();
+  if (!name) { document.getElementById("taskName").focus(); return; }
+  const area = getFormArea();
+  if (area === null) return;
+
+  const type = document.getElementById("taskType").value;
+  const energy = document.getElementById("taskEnergy").value;
+  const status = document.getElementById("taskStatus").value;
+  const due = formatDateValue(document.getElementById("taskDue").value);
+  const recurring = document.getElementById("taskRecurring").checked;
+  const notes = document.getElementById("taskNotes").value;
+
+  if (editingTaskId !== null) {
+    const task = tasks.find(t => t.id === editingTaskId);
+    if (task) {
+      task.name = name; task.area = area; task.type = type; task.energy = energy;
+      task.status = status; task.due = due; task.recurring = recurring; task.notes = notes;
+    }
+  } else {
+    const maxId = tasks.reduce((m, t) => Math.max(m, t.id), 0);
+    tasks.push({ id: maxId+1, name, area, type, energy, status, due, added: formatTodayDate(), recurring, notes });
+  }
+  closeModal(); buildFilters(); render();
+}
+
+function deleteTask() {
+  if (editingTaskId === null) return;
+  const task = tasks.find(t => t.id === editingTaskId);
+  if (task && confirm('Delete "' + task.name + '"?')) {
+    tasks.splice(tasks.indexOf(task), 1);
+    closeModal(); buildFilters(); render();
+  }
+}
+
+document.getElementById("modalOverlay").addEventListener("click", (e) => {
+  if (e.target === document.getElementById("modalOverlay")) closeModal();
+});
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") closeModal();
+});
+
+// ─── INIT ────────────────────────────────────────────────────────
+buildFilters();
+render();
+</script>
+
+</body>
+</html>
