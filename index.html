@@ -166,6 +166,7 @@
   }
 
   .stat-dot.todo { background: var(--rose); }
+  .stat-dot.in-progress { background: var(--lavender); }
   .stat-dot.done { background: var(--sage); }
   .stat-dot.waiting { background: var(--peach); }
 
@@ -300,6 +301,7 @@
   .status-pill:hover { opacity: 0.85; transform: scale(1.05); }
 
   .status-pill.todo { background: linear-gradient(135deg, #4a3d5c, #5c4e6b); }
+  .status-pill.in-progress { background: linear-gradient(135deg, var(--lavender), #9478b8); }
   .status-pill.done { background: linear-gradient(135deg, var(--sage), #6bab94); }
   .status-pill.waiting { background: linear-gradient(135deg, var(--peach), #e8975a); }
 
@@ -561,6 +563,7 @@
         <label for="taskStatus">Status</label>
         <select id="taskStatus">
           <option value="To Do" selected>To Do</option>
+          <option value="In Progress">In Progress</option>
           <option value="Done">Done</option>
           <option value="Waiting">Waiting</option>
         </select>
@@ -602,6 +605,7 @@
   </div>
   <div class="stats">
     <div class="stat"><span class="stat-dot todo"></span><span id="statTodo">0 to do</span></div>
+    <div class="stat"><span class="stat-dot in-progress"></span><span id="statInProgress">0 in progress</span></div>
     <div class="stat"><span class="stat-dot done"></span><span id="statDone">0 done</span></div>
     <div class="stat"><span class="stat-dot waiting"></span><span id="statWaiting">0 waiting</span></div>
   </div>
@@ -664,7 +668,7 @@ function buildFilters() {
 
   const groups = [
     { label: "Type", key: "type", options: ["All", "Work", "Personal"] },
-    { label: "Status", key: "status", options: ["All", "To Do", "Done", "Waiting"] },
+    { label: "Status", key: "status", options: ["All", "To Do", "In Progress", "Done", "Waiting"] },
     { label: "Energy", key: "energy", options: ["All", "High", "Medium", "Low"] },
     { label: "Category", key: "area", options: ["All", ...areas] },
   ];
@@ -695,7 +699,7 @@ function buildFilters() {
 }
 
 // ─── STATUS CYCLE ────────────────────────────────────────────────
-const statusCycle = ["To Do", "Done", "Waiting"];
+const statusCycle = ["To Do", "In Progress", "Done", "Waiting"];
 function cycleStatus(task) {
   const idx = statusCycle.indexOf(task.status);
   task.status = statusCycle[(idx + 1) % statusCycle.length];
@@ -724,7 +728,9 @@ function render() {
 
   document.getElementById("progressFill").style.width = pct + "%";
   document.getElementById("progressText").textContent = doneCount + " / " + total + " done (" + pct + "%)";
+  const inProgressCount = tasks.filter(t => t.status === "In Progress").length;
   document.getElementById("statTodo").textContent = todoCount + " to do";
+  document.getElementById("statInProgress").textContent = inProgressCount + " in progress";
   document.getElementById("statDone").textContent = doneCount + " done";
   document.getElementById("statWaiting").textContent = waitingCount + " waiting";
 
