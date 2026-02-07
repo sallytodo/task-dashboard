@@ -239,7 +239,7 @@
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
     overflow: hidden;
-    cursor: default;
+    cursor: pointer;
   }
 
   .task-card:hover {
@@ -788,7 +788,7 @@ function render() {
       tags += '<span class="tag tag-notes">Notes</span>';
     }
 
-    return '<div class="task-card status-' + sLower + ' type-' + tLower + highlight + '">' +
+    return '<div class="task-card status-' + sLower + ' type-' + tLower + highlight + '" data-card-id="' + t.id + '">' +
       '<div class="card-color-bar energy-' + eLower + '"></div>' +
       '<div class="card-body">' +
         '<div class="card-top">' +
@@ -810,11 +810,10 @@ function render() {
     });
   });
 
-  // Edit handlers
-  grid.querySelectorAll("[data-edit-id]").forEach(el => {
-    el.addEventListener("click", (e) => {
-      e.stopPropagation();
-      openEditModal(parseInt(el.getAttribute("data-edit-id")));
+  // Card click → open edit modal
+  grid.querySelectorAll("[data-card-id]").forEach(el => {
+    el.addEventListener("click", () => {
+      openEditModal(parseInt(el.getAttribute("data-card-id")));
     });
   });
 }
