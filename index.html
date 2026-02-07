@@ -649,12 +649,239 @@
 
   .settings-close:hover { background: var(--blush); }
 
+  .add-category-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+  }
+
+  .add-category-input {
+    flex: 1;
+    padding: 8px 14px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-size: 0.82rem;
+    font-family: inherit;
+    color: var(--text);
+    background: #fff;
+    transition: border-color 0.25s, box-shadow 0.25s;
+  }
+
+  .add-category-input:focus {
+    outline: none;
+    border-color: var(--rose);
+    box-shadow: 0 0 0 3px rgba(232,99,139,0.1);
+  }
+
+  .add-category-btn {
+    padding: 8px 18px;
+    border-radius: 50px;
+    border: none;
+    background: linear-gradient(135deg, var(--sage), #6bab94);
+    color: #fff;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+  }
+
+  .add-category-btn:hover { box-shadow: 0 2px 8px rgba(126,184,162,0.35); transform: translateY(-1px); }
+
   .settings-footer {
     display: flex;
     justify-content: flex-end;
     padding-top: 16px;
     border-top: 1px solid var(--border-light);
   }
+
+  /* ─── Inbox button (topbar) ─── */
+  .inbox-btn {
+    position: relative;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.3);
+    background: rgba(255,255,255,0.12);
+    color: #fff;
+    font-size: 1.1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.25s;
+    backdrop-filter: blur(4px);
+  }
+
+  .inbox-btn:hover { background: rgba(255,255,255,0.25); }
+
+  /* ─── Check Email button (topbar) ─── */
+  .check-email-btn {
+    padding: 8px 18px;
+    border-radius: 50px;
+    border: 1px solid rgba(255,255,255,0.3);
+    background: rgba(255,255,255,0.12);
+    color: #fff;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.25s;
+    backdrop-filter: blur(4px);
+    letter-spacing: 0.2px;
+    white-space: nowrap;
+  }
+
+  .check-email-btn:hover { background: rgba(255,255,255,0.25); }
+  .check-email-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+  .inbox-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    background: var(--peach);
+    color: #fff;
+    font-size: 0.62rem;
+    font-weight: 700;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 6px rgba(244,162,97,0.4);
+  }
+
+  .inbox-badge.hidden { display: none; }
+
+  /* ─── Inbox section ─── */
+  .inbox-section {
+    background: linear-gradient(145deg, #fef9f4 0%, #fdf5ee 100%);
+    border: 1px solid #f0dcc8;
+    border-radius: 16px;
+    padding: 18px 22px;
+    margin-bottom: 22px;
+    box-shadow: 0 2px 12px rgba(244,162,97,0.08);
+  }
+
+  .inbox-section.hidden { display: none; }
+
+  .inbox-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .inbox-header h3 {
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .inbox-count {
+    background: var(--peach);
+    color: #fff;
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 50px;
+  }
+
+  .inbox-toggle {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    transition: transform 0.2s;
+  }
+
+  .inbox-toggle.collapsed { transform: rotate(-90deg); }
+
+  .inbox-list {
+    margin-top: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .inbox-list.collapsed { display: none; }
+
+  .inbox-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: #fff;
+    border: 1px solid #f0dcc8;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .inbox-card:hover {
+    border-color: var(--peach);
+    box-shadow: 0 2px 10px rgba(244,162,97,0.12);
+  }
+
+  .inbox-card-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .inbox-card-name {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .inbox-card-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  .inbox-card-actions {
+    display: flex;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+
+  .inbox-approve-btn {
+    padding: 6px 16px;
+    border-radius: 50px;
+    border: none;
+    background: linear-gradient(135deg, var(--sage), #6bab94);
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+  }
+
+  .inbox-approve-btn:hover { box-shadow: 0 2px 8px rgba(126,184,162,0.35); transform: translateY(-1px); }
+
+  .inbox-dismiss-btn {
+    padding: 6px 14px;
+    border-radius: 50px;
+    border: 1px solid var(--border);
+    background: #fff;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+  }
+
+  .inbox-dismiss-btn:hover { border-color: var(--rose-light); color: var(--rose); }
 
   /* ─── Responsive ─── */
   @media (max-width: 640px) {
@@ -675,6 +902,11 @@
   </div>
   <div class="topbar-actions">
     <button class="add-btn" onclick="openModal()">+ New Task</button>
+    <button class="inbox-btn" onclick="toggleInbox()" title="Inbox" id="inboxBtn">
+      &#9993;
+      <span class="inbox-badge hidden" id="inboxBadge">0</span>
+    </button>
+    <button class="check-email-btn" id="checkEmailBtn" onclick="checkEmail()" title="Check for new email tasks" style="display:none;">Check Email</button>
     <button class="settings-btn" onclick="openSettings()" title="Settings">&#9881;</button>
   </div>
 </div>
@@ -685,10 +917,18 @@
     <div class="settings-section">
       <h3>Work Categories</h3>
       <div class="category-list" id="workCategories"></div>
+      <div class="add-category-row">
+        <input type="text" id="addWorkCategory" class="add-category-input" placeholder="New category name...">
+        <button class="add-category-btn" onclick="addCategory('Work')">Add</button>
+      </div>
     </div>
     <div class="settings-section">
       <h3>Personal Categories</h3>
       <div class="category-list" id="personalCategories"></div>
+      <div class="add-category-row">
+        <input type="text" id="addPersonalCategory" class="add-category-input" placeholder="New category name...">
+        <button class="add-category-btn" onclick="addCategory('Personal')">Add</button>
+      </div>
     </div>
     <div class="settings-footer">
       <button class="settings-close" onclick="closeSettings()">Close</button>
@@ -778,6 +1018,14 @@
   </div>
 </div>
 
+<div class="inbox-section hidden" id="inboxSection">
+  <div class="inbox-header" onclick="toggleInboxCollapse()">
+    <h3>Inbox <span class="inbox-count" id="inboxCount">0</span></h3>
+    <span class="inbox-toggle" id="inboxToggle">&#9660;</span>
+  </div>
+  <div class="inbox-list" id="inboxList"></div>
+</div>
+
 <div class="filters" id="filters"></div>
 
 <div class="task-grid" id="taskGrid"></div>
@@ -821,9 +1069,15 @@ const tasks = [
   { id: 38, name: "Order ufh", area: "Ongoing", type: "Personal", energy: "Medium", status: "To Do", added: "7th Feb 2026", notes: "Category - house" },
 ];
 
+// ─── INBOX DATA ─────────────────────────────────────────────────
+const inbox = [
+  { id: 39, name: "Test", area: "Misc", type: "Work", energy: "Medium", status: "To Do", added: "7th Feb 2026", notes: "" },
+];
+
 // ─── STATE ───────────────────────────────────────────────────────
 let activeFilters = { status: new Set(["All"]), energy: new Set(["All"]), area: new Set(["All"]), type: new Set(["All"]) };
 let editingTaskId = null;
+const customCategories = { Work: ["Misc"], Personal: ["Misc"] };
 
 // ─── THURSDAY CHECK ──────────────────────────────────────────────
 const today = new Date();
@@ -995,8 +1249,7 @@ function escapeHtml(str) {
 function populateAreaDropdown(selectedArea) {
   const sel = document.getElementById("taskArea");
   const selectedType = document.getElementById("taskType").value;
-  const typeTasks = tasks.filter(t => (t.type || "Work") === selectedType);
-  const areas = [...new Set(typeTasks.map(t => t.area))].sort();
+  const areas = getCategoriesForType(selectedType);
   sel.innerHTML = areas.map(a => '<option value="' + escapeHtml(a) + '">' + escapeHtml(a) + '</option>').join("")
     + '<option value="__new__">+ Add new category</option>';
   if (selectedArea && areas.includes(selectedArea)) {
@@ -1015,7 +1268,7 @@ function openModal() {
   document.getElementById("btnDelete").style.display = "none";
   document.getElementById("taskName").value = "";
   document.getElementById("taskType").value = "Work";
-  populateAreaDropdown("Ongoing");
+  populateAreaDropdown("Misc");
   document.getElementById("taskEnergy").value = "Medium";
   document.getElementById("taskStatus").value = "To Do";
   document.getElementById("taskDue").value = "";
@@ -1063,6 +1316,8 @@ function handleAreaChange() {
 function closeModal() {
   document.getElementById("modalOverlay").classList.remove("open");
   editingTaskId = null;
+  editingInboxIdx = null;
+  document.getElementById("btnDelete").textContent = "Delete";
 }
 
 function formatTodayDate() {
@@ -1105,20 +1360,43 @@ function saveTask() {
   const recurring = document.getElementById("taskRecurring").checked;
   const notes = document.getElementById("taskNotes").value;
 
-  if (editingTaskId !== null) {
+  if (editingInboxIdx !== null) {
+    // Approving from inbox with edits
+    const maxId = Math.max(
+      tasks.reduce((m, t) => Math.max(m, t.id), 0),
+      inbox.reduce((m, t) => Math.max(m, t.id || 0), 0)
+    );
+    tasks.push({ id: maxId+1, name, area, type, energy, status, due, added: inbox[editingInboxIdx].added || formatTodayDate(), recurring, notes });
+    inbox.splice(editingInboxIdx, 1);
+    editingInboxIdx = null;
+    closeModal(); buildFilters(); render(); renderInbox();
+  } else if (editingTaskId !== null) {
     const task = tasks.find(t => t.id === editingTaskId);
     if (task) {
       task.name = name; task.area = area; task.type = type; task.energy = energy;
       task.status = status; task.due = due; task.recurring = recurring; task.notes = notes;
     }
+    closeModal(); buildFilters(); render();
   } else {
-    const maxId = tasks.reduce((m, t) => Math.max(m, t.id), 0);
+    const maxId = Math.max(
+      tasks.reduce((m, t) => Math.max(m, t.id), 0),
+      inbox.reduce((m, t) => Math.max(m, t.id || 0), 0)
+    );
     tasks.push({ id: maxId+1, name, area, type, energy, status, due, added: formatTodayDate(), recurring, notes });
+    closeModal(); buildFilters(); render();
   }
-  closeModal(); buildFilters(); render();
 }
 
 function deleteTask() {
+  if (editingInboxIdx !== null) {
+    const item = inbox[editingInboxIdx];
+    if (item && confirm('Dismiss "' + item.name + '" from inbox?')) {
+      inbox.splice(editingInboxIdx, 1);
+      editingInboxIdx = null;
+      closeModal(); renderInbox();
+    }
+    return;
+  }
   if (editingTaskId === null) return;
   const task = tasks.find(t => t.id === editingTaskId);
   if (task && confirm('Delete "' + task.name + '"?')) {
@@ -1148,8 +1426,10 @@ function renderSettings() {
   ["Work", "Personal"].forEach(type => {
     const containerId = type === "Work" ? "workCategories" : "personalCategories";
     const container = document.getElementById(containerId);
+    const allCats = getCategoriesForType(type);
     const typeTasks = tasks.filter(t => (t.type || "Work") === type);
     const cats = {};
+    allCats.forEach(c => { cats[c] = 0; });
     typeTasks.forEach(t => { cats[t.area] = (cats[t.area] || 0) + 1; });
     const sorted = Object.keys(cats).sort();
 
@@ -1160,12 +1440,13 @@ function renderSettings() {
 
     container.innerHTML = sorted.map(cat => {
       const count = cats[cat];
+      const isMisc = cat === "Misc";
       return '<div class="category-row">' +
         '<div class="category-info">' +
           '<span class="category-name">' + escapeHtml(cat) + '</span>' +
           '<span class="category-count">' + count + ' task' + (count !== 1 ? 's' : '') + '</span>' +
         '</div>' +
-        '<button class="category-delete-btn" data-cat="' + escapeHtml(cat) + '" data-type="' + type + '">Delete</button>' +
+        (isMisc ? '' : '<button class="category-delete-btn" data-cat="' + escapeHtml(cat) + '" data-type="' + type + '">Delete</button>') +
       '</div>';
     }).join("");
 
@@ -1180,40 +1461,241 @@ function renderSettings() {
 }
 
 function deleteCategory(cat, type) {
+  if (cat === "Misc") return;
   const affected = tasks.filter(t => t.area === cat && (t.type || "Work") === type);
-  if (affected.length === 0) return;
 
-  // Find other categories for this type to reassign to
-  const typeTasks = tasks.filter(t => (t.type || "Work") === type && t.area !== cat);
-  const otherCats = [...new Set(typeTasks.map(t => t.area))].sort();
-  const fallback = otherCats.length > 0 ? otherCats[0] : "Ongoing";
+  if (affected.length > 0) {
+    const otherCats = getCategoriesForType(type).filter(c => c !== cat);
+    const fallback = "Misc";
 
-  let moveTo = fallback;
-  if (otherCats.length > 0) {
-    moveTo = prompt(
-      'Delete "' + cat + '"? (' + affected.length + ' task' + (affected.length !== 1 ? 's' : '') + ' will move)\n\n' +
-      'Move tasks to which category?\n' + otherCats.join(', '),
-      fallback
-    );
-    if (moveTo === null) return;
-    if (!otherCats.includes(moveTo)) moveTo = fallback;
+    let moveTo = fallback;
+    if (otherCats.length > 1) {
+      moveTo = prompt(
+        'Delete "' + cat + '"? (' + affected.length + ' task' + (affected.length !== 1 ? 's' : '') + ' will move)\n\n' +
+        'Move tasks to which category?\n' + otherCats.join(', '),
+        fallback
+      );
+      if (moveTo === null) return;
+      if (!otherCats.includes(moveTo)) moveTo = fallback;
+    } else {
+      if (!confirm('Delete "' + cat + '"? ' + affected.length + ' task' + (affected.length !== 1 ? 's' : '') + ' will move to "Misc".')) return;
+    }
+
+    affected.forEach(t => { t.area = moveTo; });
   } else {
-    if (!confirm('Delete "' + cat + '"? ' + affected.length + ' task' + (affected.length !== 1 ? 's' : '') + ' will move to "Ongoing".')) return;
+    if (!confirm('Delete empty category "' + cat + '"?')) return;
   }
 
-  affected.forEach(t => { t.area = moveTo; });
+  // Remove from customCategories if present
+  const idx = customCategories[type].indexOf(cat);
+  if (idx !== -1) customCategories[type].splice(idx, 1);
+
   renderSettings();
   buildFilters();
   render();
+}
+
+function getCategoriesForType(type) {
+  const typeTasks = tasks.filter(t => (t.type || "Work") === type);
+  const fromTasks = typeTasks.map(t => t.area);
+  const fromCustom = customCategories[type] || [];
+  return [...new Set([...fromTasks, ...fromCustom])].sort();
+}
+
+function addCategory(type) {
+  const inputId = type === "Work" ? "addWorkCategory" : "addPersonalCategory";
+  const input = document.getElementById(inputId);
+  const name = input.value.trim();
+  if (!name) { input.focus(); return; }
+
+  const allCats = getCategoriesForType(type);
+  if (allCats.includes(name)) {
+    alert('Category "' + name + '" already exists for ' + type + '.');
+    return;
+  }
+
+  customCategories[type].push(name);
+  input.value = "";
+  renderSettings();
+  buildFilters();
 }
 
 document.getElementById("settingsOverlay").addEventListener("click", (e) => {
   if (e.target === document.getElementById("settingsOverlay")) closeSettings();
 });
 
+document.getElementById("addWorkCategory").addEventListener("keydown", (e) => {
+  if (e.key === "Enter") addCategory("Work");
+});
+document.getElementById("addPersonalCategory").addEventListener("keydown", (e) => {
+  if (e.key === "Enter") addCategory("Personal");
+});
+
+// ─── INBOX ──────────────────────────────────────────────────────
+let inboxCollapsed = false;
+let editingInboxIdx = null;
+
+function updateInboxBadge() {
+  const badge = document.getElementById("inboxBadge");
+  const section = document.getElementById("inboxSection");
+  const countEl = document.getElementById("inboxCount");
+  if (inbox.length > 0) {
+    badge.textContent = inbox.length;
+    badge.classList.remove("hidden");
+    section.classList.remove("hidden");
+    countEl.textContent = inbox.length;
+  } else {
+    badge.classList.add("hidden");
+    section.classList.add("hidden");
+  }
+}
+
+function toggleInbox() {
+  const section = document.getElementById("inboxSection");
+  if (inbox.length === 0) return;
+  if (section.classList.contains("hidden")) {
+    section.classList.remove("hidden");
+  } else {
+    section.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+}
+
+function toggleInboxCollapse() {
+  inboxCollapsed = !inboxCollapsed;
+  document.getElementById("inboxList").classList.toggle("collapsed", inboxCollapsed);
+  document.getElementById("inboxToggle").classList.toggle("collapsed", inboxCollapsed);
+}
+
+function renderInbox() {
+  updateInboxBadge();
+  const list = document.getElementById("inboxList");
+  if (inbox.length === 0) { list.innerHTML = ""; return; }
+
+  list.innerHTML = inbox.map((item, idx) => {
+    const eLower = item.energy ? item.energy.toLowerCase() : "";
+    const tLower = (item.type || "Work").toLowerCase();
+    let tags = '';
+    tags += '<span class="tag tag-area">' + escapeHtml(item.area || "Misc") + '</span>';
+    if (tLower === "work") {
+      tags += '<span class="tag" style="background:var(--rose-light);color:var(--rose-dark);">Work</span>';
+    } else {
+      tags += '<span class="tag" style="background:var(--lavender-light);color:var(--plum);">Personal</span>';
+    }
+    if (item.energy) {
+      tags += '<span class="tag tag-energy-' + eLower + '">' + item.energy + '</span>';
+    }
+
+    return '<div class="inbox-card" data-inbox-idx="' + idx + '">' +
+      '<div class="inbox-card-info">' +
+        '<div class="inbox-card-name">' + escapeHtml(item.name) + '</div>' +
+        '<div class="inbox-card-meta">' + tags + '</div>' +
+      '</div>' +
+      '<div class="inbox-card-actions">' +
+        '<button class="inbox-approve-btn" data-approve-idx="' + idx + '">Approve</button>' +
+        '<button class="inbox-dismiss-btn" data-dismiss-idx="' + idx + '">Dismiss</button>' +
+      '</div>' +
+    '</div>';
+  }).join("");
+
+  // Card click → open edit modal pre-filled
+  list.querySelectorAll("[data-inbox-idx]").forEach(el => {
+    el.addEventListener("click", (e) => {
+      if (e.target.closest("[data-approve-idx]") || e.target.closest("[data-dismiss-idx]")) return;
+      openInboxEditModal(parseInt(el.getAttribute("data-inbox-idx")));
+    });
+  });
+
+  // Approve button
+  list.querySelectorAll("[data-approve-idx]").forEach(btn => {
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      approveInboxItem(parseInt(btn.getAttribute("data-approve-idx")));
+    });
+  });
+
+  // Dismiss button
+  list.querySelectorAll("[data-dismiss-idx]").forEach(btn => {
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      dismissInboxItem(parseInt(btn.getAttribute("data-dismiss-idx")));
+    });
+  });
+}
+
+function approveInboxItem(idx) {
+  const item = inbox[idx];
+  if (!item) return;
+  const maxId = Math.max(
+    tasks.reduce((m, t) => Math.max(m, t.id), 0),
+    inbox.reduce((m, t) => Math.max(m, t.id || 0), 0)
+  );
+  item.id = maxId + 1;
+  tasks.push(item);
+  inbox.splice(idx, 1);
+  renderInbox();
+  buildFilters();
+  render();
+}
+
+function dismissInboxItem(idx) {
+  const item = inbox[idx];
+  if (!item) return;
+  if (confirm('Dismiss "' + item.name + '" from inbox?')) {
+    inbox.splice(idx, 1);
+    renderInbox();
+  }
+}
+
+function openInboxEditModal(idx) {
+  const item = inbox[idx];
+  if (!item) return;
+  editingInboxIdx = idx;
+  editingTaskId = null;
+  document.getElementById("modalTitle").textContent = "Review Inbox Task";
+  document.getElementById("btnSave").textContent = "Approve";
+  document.getElementById("btnDelete").style.display = "inline-block";
+  document.getElementById("btnDelete").textContent = "Dismiss";
+  document.getElementById("taskName").value = item.name;
+  document.getElementById("taskType").value = item.type || "Work";
+  populateAreaDropdown(item.area);
+  document.getElementById("taskEnergy").value = item.energy || "Medium";
+  document.getElementById("taskStatus").value = item.status || "To Do";
+  document.getElementById("taskDue").value = parseDateToInput(item.due);
+  document.getElementById("taskRecurring").checked = !!item.recurring;
+  document.getElementById("taskNotes").value = item.notes || "";
+  document.getElementById("modalOverlay").classList.add("open");
+  document.getElementById("taskName").focus();
+}
+
+// ─── CHECK EMAIL ─────────────────────────────────────────────────
+function checkEmail() {
+  const btn = document.getElementById("checkEmailBtn");
+  btn.disabled = true;
+  btn.textContent = "Checking\u2026";
+  fetch("/api/check-tasks", { method: "POST" })
+    .then(r => r.json())
+    .then(data => {
+      if (data.created > 0) {
+        location.reload();
+      } else {
+        btn.textContent = data.message || "No new tasks";
+        setTimeout(() => { btn.textContent = "Check Email"; btn.disabled = false; }, 2500);
+      }
+    })
+    .catch(() => {
+      btn.textContent = "Server offline";
+      setTimeout(() => { btn.textContent = "Check Email"; btn.disabled = false; }, 2500);
+    });
+}
+
 // ─── INIT ────────────────────────────────────────────────────────
+// Show check-email button only when served via HTTP (not file://)
+if (location.protocol === "http:" || location.protocol === "https:") {
+  document.getElementById("checkEmailBtn").style.display = "";
+}
 buildFilters();
 render();
+renderInbox();
 </script>
 
 </body>
