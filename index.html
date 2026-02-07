@@ -539,7 +539,7 @@
     <div class="form-field-row">
       <div class="form-field">
         <label for="taskType">Type</label>
-        <select id="taskType">
+        <select id="taskType" onchange="populateAreaDropdown()">
           <option value="Work" selected>Work</option>
           <option value="Personal">Personal</option>
         </select>
@@ -827,13 +827,15 @@ function escapeHtml(str) {
 // ─── MODAL ───────────────────────────────────────────────────────
 function populateAreaDropdown(selectedArea) {
   const sel = document.getElementById("taskArea");
-  const areas = [...new Set(tasks.map(t => t.area))].sort();
+  const selectedType = document.getElementById("taskType").value;
+  const typeTasks = tasks.filter(t => (t.type || "Work") === selectedType);
+  const areas = [...new Set(typeTasks.map(t => t.area))].sort();
   sel.innerHTML = areas.map(a => '<option value="' + escapeHtml(a) + '">' + escapeHtml(a) + '</option>').join("")
     + '<option value="__new__">+ Add new category</option>';
   if (selectedArea && areas.includes(selectedArea)) {
     sel.value = selectedArea;
-  } else {
-    sel.value = "Ongoing";
+  } else if (areas.length > 0) {
+    sel.value = areas[0];
   }
   document.getElementById("taskAreaNew").style.display = "none";
   document.getElementById("taskAreaNew").value = "";
@@ -844,9 +846,9 @@ function openModal() {
   document.getElementById("modalTitle").textContent = "New Task";
   document.getElementById("btnSave").textContent = "Add Task";
   document.getElementById("btnDelete").style.display = "none";
-  populateAreaDropdown("Ongoing");
   document.getElementById("taskName").value = "";
   document.getElementById("taskType").value = "Work";
+  populateAreaDropdown("Ongoing");
   document.getElementById("taskEnergy").value = "Medium";
   document.getElementById("taskStatus").value = "To Do";
   document.getElementById("taskDue").value = "";
@@ -863,9 +865,9 @@ function openEditModal(id) {
   document.getElementById("modalTitle").textContent = "Edit Task";
   document.getElementById("btnSave").textContent = "Save Changes";
   document.getElementById("btnDelete").style.display = "inline-block";
-  populateAreaDropdown(task.area);
   document.getElementById("taskName").value = task.name;
   document.getElementById("taskType").value = task.type || "Work";
+  populateAreaDropdown(task.area);
   document.getElementById("taskEnergy").value = task.energy || "Medium";
   document.getElementById("taskStatus").value = task.status;
   document.getElementById("taskDue").value = parseDateToInput(task.due);
