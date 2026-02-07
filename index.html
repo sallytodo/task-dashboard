@@ -715,7 +715,7 @@
 
   .inbox-btn:hover { background: rgba(255,255,255,0.25); }
 
-  /* ─── Check Email button (topbar) ─── */
+  /* ─── Check Tasks button (topbar) ─── */
   .check-email-btn {
     padding: 8px 18px;
     border-radius: 50px;
@@ -883,6 +883,144 @@
 
   .inbox-dismiss-btn:hover { border-color: var(--rose-light); color: var(--rose); }
 
+  /* ─── View toggle ─── */
+  .view-toggle {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 18px;
+    background: var(--warm-white);
+    border: 1px solid var(--border);
+    border-radius: 50px;
+    padding: 3px;
+    width: fit-content;
+  }
+
+  .view-toggle-btn {
+    padding: 6px 20px;
+    border-radius: 50px;
+    border: none;
+    background: transparent;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    color: var(--text-light);
+    font-family: inherit;
+    transition: all 0.2s;
+    letter-spacing: 0.2px;
+  }
+
+  .view-toggle-btn:hover { color: var(--text); }
+
+  .view-toggle-btn.active {
+    background: linear-gradient(135deg, var(--rose), var(--mauve));
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(212,80,122,0.25);
+  }
+
+  /* ─── Table view ─── */
+  .table-wrap {
+    overflow-x: auto;
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    background: var(--warm-white);
+    box-shadow: 0 2px 12px rgba(180,140,170,0.06);
+  }
+
+  .task-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 700px;
+    font-size: 0.85rem;
+  }
+
+  .task-table th {
+    text-align: left;
+    padding: 12px 16px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    border-bottom: 1px solid var(--border);
+    background: var(--cream);
+    cursor: pointer;
+    user-select: none;
+    white-space: nowrap;
+    transition: color 0.15s;
+  }
+
+  .task-table th:hover { color: var(--text); }
+
+  .task-table th .sort-arrow {
+    display: inline-block;
+    margin-left: 4px;
+    font-size: 0.6rem;
+    opacity: 0.4;
+    transition: opacity 0.15s;
+  }
+
+  .task-table th.sorted .sort-arrow { opacity: 1; color: var(--rose); }
+
+  .task-table td {
+    padding: 11px 16px;
+    border-bottom: 1px solid var(--border-light);
+    vertical-align: middle;
+    color: var(--text);
+  }
+
+  .task-table tr { cursor: pointer; transition: background 0.15s; }
+  .task-table tbody tr:hover { background: rgba(176,122,171,0.06); }
+  .task-table tbody tr:last-child td { border-bottom: none; }
+
+  .task-table tr.type-work { background: linear-gradient(90deg, rgba(252,228,236,0.35), transparent); }
+  .task-table tr.type-personal { background: linear-gradient(90deg, rgba(240,234,247,0.45), transparent); }
+  .task-table tbody tr.type-work:hover { background: rgba(252,228,236,0.55); }
+  .task-table tbody tr.type-personal:hover { background: rgba(240,234,247,0.6); }
+
+  .task-table tr.status-done td.col-name { text-decoration: line-through; color: var(--text-muted); }
+  .task-table tr.status-done { opacity: 0.55; }
+
+  .table-energy-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 6px;
+    vertical-align: middle;
+  }
+
+  .table-energy-dot.high { background: var(--rose); }
+  .table-energy-dot.medium { background: var(--peach); }
+  .table-energy-dot.low { background: var(--sage); }
+
+  .table-status-pill {
+    padding: 3px 12px;
+    border-radius: 50px;
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    cursor: pointer;
+    border: none;
+    color: #fff;
+    white-space: nowrap;
+    transition: all 0.2s;
+    font-family: inherit;
+  }
+
+  .table-status-pill:hover { opacity: 0.85; transform: scale(1.05); }
+  .table-status-pill.todo { background: linear-gradient(135deg, #4a3d5c, #5c4e6b); }
+  .table-status-pill.in-progress { background: linear-gradient(135deg, var(--lavender), #9478b8); }
+  .table-status-pill.done { background: linear-gradient(135deg, var(--sage), #6bab94); }
+  .table-status-pill.waiting { background: linear-gradient(135deg, var(--peach), #e8975a); }
+
+  .no-tasks-table {
+    text-align: center;
+    padding: 40px 24px;
+    color: var(--text-muted);
+    font-size: 0.88rem;
+  }
+
   /* ─── Responsive ─── */
   @media (max-width: 640px) {
     .main { padding: 16px; }
@@ -897,8 +1035,8 @@
 
 <div class="topbar">
   <div>
-    <h1>Sally's Dashboard</h1>
-    <p>Money Means &middot; Chief of Staff</p>
+    <h1 id="dashTitle">Sally's Dashboard</h1>
+    <p id="dashSubtitle">Money Means &middot; Chief of Staff</p>
   </div>
   <div class="topbar-actions">
     <button class="add-btn" onclick="openModal()">+ New Task</button>
@@ -906,7 +1044,7 @@
       &#9993;
       <span class="inbox-badge hidden" id="inboxBadge">0</span>
     </button>
-    <button class="check-email-btn" id="checkEmailBtn" onclick="checkEmail()" title="Check for new email tasks" style="display:none;">Check Email</button>
+    <button class="check-email-btn" id="checkEmailBtn" onclick="checkEmail()" title="Check for new email tasks" style="display:none;">Check Tasks</button>
     <button class="settings-btn" onclick="openSettings()" title="Settings">&#9881;</button>
   </div>
 </div>
@@ -914,6 +1052,13 @@
 <div class="settings-overlay" id="settingsOverlay">
   <div class="settings-panel">
     <h2>Settings</h2>
+    <div class="settings-section">
+      <h3>Dashboard</h3>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <input type="text" id="settingsTitle" class="add-category-input" placeholder="Dashboard title">
+        <input type="text" id="settingsSubtitle" class="add-category-input" placeholder="Subtitle">
+      </div>
+    </div>
     <div class="settings-section">
       <h3>Work Categories</h3>
       <div class="category-list" id="workCategories"></div>
@@ -1028,7 +1173,13 @@
 
 <div class="filters" id="filters"></div>
 
+<div class="view-toggle" id="viewToggle">
+  <button class="view-toggle-btn active" data-view="dashboard" onclick="setView('dashboard')">Dashboard</button>
+  <button class="view-toggle-btn" data-view="database" onclick="setView('database')">Database</button>
+</div>
+
 <div class="task-grid" id="taskGrid"></div>
+<div class="table-wrap" id="tableView" style="display:none"></div>
 
 </div>
 
@@ -1073,17 +1224,25 @@ const tasks = [
   { id: 43, name: "Television", area: "Misc", type: "Personal", energy: "Medium", status: "To Do", added: "7th Feb 2026", notes: "" },
   { id: 44, name: "Sofa", area: "Misc", type: "Personal", energy: "Medium", status: "To Do", added: "7th Feb 2026", notes: "" },
   { id: 45, name: "Get rich", area: "Misc", type: "Personal", energy: "Medium", status: "To Do", added: "7th Feb 2026", notes: "" },
+  { id: 46, name: "Pick up dry cleaning", area: "Misc", type: "Personal", energy: "Medium", status: "To Do", added: "7th Feb 2026", notes: "" },
 ];
 
 // ─── INBOX DATA ─────────────────────────────────────────────────
 const inbox = [
-  { id: 46, name: "Pick up dry cleaning", area: "Misc", type: "Personal", energy: "Medium", status: "To Do", added: "7th Feb 2026", notes: "" },
+  { id: 47, name: "Buy Ben a present", area: "Misc", type: "Personal", energy: "Medium", status: "To Do", added: "7th Feb 2026", notes: "" },
 ];
 
 // ─── STATE ───────────────────────────────────────────────────────
 let activeFilters = { status: new Set(["All"]), energy: new Set(["All"]), area: new Set(["All"]), type: new Set(["All"]) };
 let editingTaskId = null;
-const customCategories = { Work: ["Misc"], Personal: ["Misc"] };
+const customCategories = JSON.parse(localStorage.getItem("customCategories") || '{"Work":["Misc"],"Personal":["Misc"]}');
+let viewMode = "dashboard";
+let sortColumn = null;
+let sortDirection = "asc";
+
+// Apply persisted task area overrides (from category deletions)
+const _areaOverrides = JSON.parse(localStorage.getItem("taskAreaOverrides") || "{}");
+tasks.forEach(t => { if (_areaOverrides[t.id]) t.area = _areaOverrides[t.id]; });
 
 // ─── THURSDAY CHECK ──────────────────────────────────────────────
 const today = new Date();
@@ -1156,33 +1315,105 @@ function cycleStatus(task) {
   render();
 }
 
-// ─── RENDER ──────────────────────────────────────────────────────
-function render() {
-  const grid = document.getElementById("taskGrid");
-  const isThursday = today.getDay() === 4;
+// ─── VIEW TOGGLE ─────────────────────────────────────────────────
+function setView(mode) {
+  viewMode = mode;
+  document.querySelectorAll(".view-toggle-btn").forEach(btn => {
+    btn.classList.toggle("active", btn.getAttribute("data-view") === mode);
+  });
+  document.getElementById("taskGrid").style.display = mode === "dashboard" ? "" : "none";
+  document.getElementById("tableView").style.display = mode === "database" ? "" : "none";
+  render();
+}
 
-  const filtered = tasks.filter(t => {
+// ─── FILTER TASKS ────────────────────────────────────────────────
+function getFilteredTasks() {
+  return tasks.filter(t => {
     if (!activeFilters.type.has("All") && !activeFilters.type.has(t.type || "Work")) return false;
     if (!activeFilters.status.has("All") && !activeFilters.status.has(t.status)) return false;
     if (!activeFilters.energy.has("All") && !activeFilters.energy.has(t.energy)) return false;
     if (!activeFilters.area.has("All") && !activeFilters.area.has(t.area)) return false;
     return true;
   });
+}
 
-  // Stats
+// ─── DATE PARSING FOR SORT ───────────────────────────────────────
+function parseDateForSort(dateStr) {
+  if (!dateStr) return 0;
+  const months = { Jan:0, Feb:1, Mar:2, Apr:3, May:4, Jun:5, Jul:6, Aug:7, Sep:8, Oct:9, Nov:10, Dec:11 };
+  const m = dateStr.match(/(\d+)\w*\s+(\w+)\s+(\d{4})/);
+  if (!m) return 0;
+  return new Date(parseInt(m[3]), months[m[2]] || 0, parseInt(m[1])).getTime();
+}
+
+// ─── SORT TASKS ──────────────────────────────────────────────────
+function sortTasks(list) {
+  if (!sortColumn) return list;
+  const energyOrder = { "High": 0, "Medium": 1, "Low": 2, "": 3 };
+  const statusOrder = { "To Do": 0, "In Progress": 1, "Waiting": 2, "Done": 3 };
+  const sorted = [...list];
+  sorted.sort((a, b) => {
+    let va, vb;
+    switch (sortColumn) {
+      case "name": va = a.name.toLowerCase(); vb = b.name.toLowerCase(); break;
+      case "category": va = (a.area || "").toLowerCase(); vb = (b.area || "").toLowerCase(); break;
+      case "type": va = (a.type || "Work"); vb = (b.type || "Work"); break;
+      case "energy":
+        va = energyOrder[a.energy || ""] ?? 3;
+        vb = energyOrder[b.energy || ""] ?? 3;
+        return sortDirection === "asc" ? va - vb : vb - va;
+      case "status":
+        va = statusOrder[a.status] ?? 4;
+        vb = statusOrder[b.status] ?? 4;
+        return sortDirection === "asc" ? va - vb : vb - va;
+      case "due":
+        va = parseDateForSort(a.due);
+        vb = parseDateForSort(b.due);
+        return sortDirection === "asc" ? va - vb : vb - va;
+      case "added":
+        va = parseDateForSort(a.added);
+        vb = parseDateForSort(b.added);
+        return sortDirection === "asc" ? va - vb : vb - va;
+      default: return 0;
+    }
+    if (va < vb) return sortDirection === "asc" ? -1 : 1;
+    if (va > vb) return sortDirection === "asc" ? 1 : -1;
+    return 0;
+  });
+  return sorted;
+}
+
+function handleColumnSort(col) {
+  if (sortColumn === col) {
+    if (sortDirection === "asc") { sortDirection = "desc"; }
+    else { sortColumn = null; sortDirection = "asc"; }
+  } else {
+    sortColumn = col;
+    sortDirection = "asc";
+  }
+  render();
+}
+
+// ─── RENDER ──────────────────────────────────────────────────────
+function renderStats() {
   const todoCount = tasks.filter(t => t.status === "To Do").length;
   const doneCount = tasks.filter(t => t.status === "Done").length;
   const waitingCount = tasks.filter(t => t.status === "Waiting").length;
+  const inProgressCount = tasks.filter(t => t.status === "In Progress").length;
   const total = tasks.length;
   const pct = total > 0 ? Math.round((doneCount / total) * 100) : 0;
 
   document.getElementById("progressFill").style.width = pct + "%";
   document.getElementById("progressText").textContent = doneCount + " / " + total + " done (" + pct + "%)";
-  const inProgressCount = tasks.filter(t => t.status === "In Progress").length;
   document.getElementById("statTodo").textContent = todoCount + " to do";
   document.getElementById("statInProgress").textContent = inProgressCount + " in progress";
   document.getElementById("statDone").textContent = doneCount + " done";
   document.getElementById("statWaiting").textContent = waitingCount + " waiting";
+}
+
+function renderGrid(filtered) {
+  const grid = document.getElementById("taskGrid");
+  const isThursday = today.getDay() === 4;
 
   if (filtered.length === 0) {
     grid.innerHTML = '<div class="no-tasks">No tasks match these filters.</div>';
@@ -1195,11 +1426,9 @@ function render() {
     const tLower = (t.type || "Work").toLowerCase();
     const highlight = isThursday && t.thursdayTask ? " thursday-highlight" : "";
 
-    // Status pill
     const statusClass = "status-pill " + sLower;
     const statusLabel = t.status;
 
-    // Tags
     let tags = '';
     tags += '<span class="tag tag-area">' + escapeHtml(t.area) + '</span>';
     if (t.energy) {
@@ -1227,7 +1456,6 @@ function render() {
       '</div>';
   }).join("");
 
-  // Status pill handlers
   grid.querySelectorAll(".status-pill").forEach(btn => {
     btn.addEventListener("click", (e) => {
       e.stopPropagation();
@@ -1237,12 +1465,104 @@ function render() {
     });
   });
 
-  // Card click → open edit modal
   grid.querySelectorAll("[data-card-id]").forEach(el => {
     el.addEventListener("click", () => {
       openEditModal(parseInt(el.getAttribute("data-card-id")));
     });
   });
+}
+
+function renderTable(filtered) {
+  const wrap = document.getElementById("tableView");
+  const sorted = sortTasks(filtered);
+
+  const columns = [
+    { key: "name", label: "Name" },
+    { key: "category", label: "Category" },
+    { key: "type", label: "Type" },
+    { key: "energy", label: "Energy" },
+    { key: "status", label: "Status" },
+    { key: "due", label: "Due" },
+    { key: "added", label: "Added" },
+  ];
+
+  if (sorted.length === 0) {
+    wrap.innerHTML = '<div class="no-tasks-table">No tasks match these filters.</div>';
+    return;
+  }
+
+  let html = '<table class="task-table"><thead><tr>';
+  columns.forEach(col => {
+    const isSorted = sortColumn === col.key;
+    const arrow = isSorted ? (sortDirection === "asc" ? "&#9650;" : "&#9660;") : "&#9650;";
+    html += '<th class="' + (isSorted ? "sorted" : "") + '" data-col="' + col.key + '">' +
+      col.label + '<span class="sort-arrow">' + arrow + '</span></th>';
+  });
+  html += '</tr></thead><tbody>';
+
+  sorted.forEach(t => {
+    const sLower = t.status.toLowerCase().replace(/ /g, "-");
+    const tLower = (t.type || "Work").toLowerCase();
+    const eLower = t.energy ? t.energy.toLowerCase() : "";
+
+    html += '<tr class="type-' + tLower + ' status-' + sLower + '" data-row-id="' + t.id + '">';
+    // Name
+    html += '<td class="col-name">' + escapeHtml(t.name) + '</td>';
+    // Category
+    html += '<td><span class="tag tag-area">' + escapeHtml(t.area) + '</span></td>';
+    // Type
+    html += '<td>' + escapeHtml(t.type || "Work") + '</td>';
+    // Energy
+    if (t.energy) {
+      html += '<td><span class="table-energy-dot ' + eLower + '"></span>' + t.energy + '</td>';
+    } else {
+      html += '<td></td>';
+    }
+    // Status
+    html += '<td><button class="table-status-pill ' + sLower + '" data-id="' + t.id + '">' + t.status + '</button></td>';
+    // Due
+    html += '<td>' + escapeHtml(t.due || "") + '</td>';
+    // Added
+    html += '<td>' + escapeHtml(t.added || "") + '</td>';
+    html += '</tr>';
+  });
+
+  html += '</tbody></table>';
+  wrap.innerHTML = html;
+
+  // Column header click → sort
+  wrap.querySelectorAll("th[data-col]").forEach(th => {
+    th.addEventListener("click", () => {
+      handleColumnSort(th.getAttribute("data-col"));
+    });
+  });
+
+  // Status pill click → cycle
+  wrap.querySelectorAll(".table-status-pill").forEach(btn => {
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const id = parseInt(btn.getAttribute("data-id"));
+      const task = tasks.find(t => t.id === id);
+      if (task) { cycleStatus(task); buildFilters(); }
+    });
+  });
+
+  // Row click → edit modal
+  wrap.querySelectorAll("[data-row-id]").forEach(tr => {
+    tr.addEventListener("click", () => {
+      openEditModal(parseInt(tr.getAttribute("data-row-id")));
+    });
+  });
+}
+
+function render() {
+  renderStats();
+  const filtered = getFilteredTasks();
+  if (viewMode === "dashboard") {
+    renderGrid(filtered);
+  } else {
+    renderTable(filtered);
+  }
 }
 
 function escapeHtml(str) {
@@ -1420,11 +1740,24 @@ document.addEventListener("keydown", (e) => {
 
 // ─── SETTINGS ───────────────────────────────────────────────────
 function openSettings() {
+  document.getElementById("settingsTitle").value = document.getElementById("dashTitle").textContent;
+  document.getElementById("settingsSubtitle").value = document.getElementById("dashSubtitle").textContent;
   renderSettings();
   document.getElementById("settingsOverlay").classList.add("open");
 }
 
 function closeSettings() {
+  // Save title/subtitle if changed
+  const newTitle = document.getElementById("settingsTitle").value.trim();
+  const newSub = document.getElementById("settingsSubtitle").value.trim();
+  if (newTitle) {
+    document.getElementById("dashTitle").textContent = newTitle;
+    localStorage.setItem("dashTitle", newTitle);
+  }
+  if (newSub) {
+    document.getElementById("dashSubtitle").textContent = newSub;
+    localStorage.setItem("dashSubtitle", newSub);
+  }
   document.getElementById("settingsOverlay").classList.remove("open");
 }
 
@@ -1487,7 +1820,11 @@ function deleteCategory(cat, type) {
       if (!confirm('Delete "' + cat + '"? ' + affected.length + ' task' + (affected.length !== 1 ? 's' : '') + ' will move to "Misc".')) return;
     }
 
-    affected.forEach(t => { t.area = moveTo; });
+    affected.forEach(t => {
+      t.area = moveTo;
+      _areaOverrides[t.id] = moveTo;
+    });
+    localStorage.setItem("taskAreaOverrides", JSON.stringify(_areaOverrides));
   } else {
     if (!confirm('Delete empty category "' + cat + '"?')) return;
   }
@@ -1495,6 +1832,7 @@ function deleteCategory(cat, type) {
   // Remove from customCategories if present
   const idx = customCategories[type].indexOf(cat);
   if (idx !== -1) customCategories[type].splice(idx, 1);
+  localStorage.setItem("customCategories", JSON.stringify(customCategories));
 
   renderSettings();
   buildFilters();
@@ -1521,6 +1859,7 @@ function addCategory(type) {
   }
 
   customCategories[type].push(name);
+  localStorage.setItem("customCategories", JSON.stringify(customCategories));
   input.value = "";
   renderSettings();
   buildFilters();
@@ -1702,16 +2041,20 @@ function checkEmail() {
         location.reload();
       } else {
         btn.textContent = data.message || "No new tasks";
-        setTimeout(() => { btn.textContent = "Check Email"; btn.disabled = false; }, 2500);
+        setTimeout(() => { btn.textContent = "Check Tasks"; btn.disabled = false; }, 2500);
       }
     })
     .catch(() => {
       btn.textContent = "Server offline";
-      setTimeout(() => { btn.textContent = "Check Email"; btn.disabled = false; }, 2500);
+      setTimeout(() => { btn.textContent = "Check Tasks"; btn.disabled = false; }, 2500);
     });
 }
 
 // ─── INIT ────────────────────────────────────────────────────────
+// Load saved title/subtitle
+if (localStorage.getItem("dashTitle")) document.getElementById("dashTitle").textContent = localStorage.getItem("dashTitle");
+if (localStorage.getItem("dashSubtitle")) document.getElementById("dashSubtitle").textContent = localStorage.getItem("dashSubtitle");
+
 // Show check-email button only when served via HTTP (not file://)
 if (location.protocol === "http:" || location.protocol === "https:") {
   document.getElementById("checkEmailBtn").style.display = "";
