@@ -509,6 +509,153 @@
 
   .btn-delete:hover { background: var(--rose-light); }
 
+  /* ─── Settings ─── */
+  .topbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .settings-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.3);
+    background: rgba(255,255,255,0.12);
+    color: #fff;
+    font-size: 1.1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.25s;
+    backdrop-filter: blur(4px);
+  }
+
+  .settings-btn:hover { background: rgba(255,255,255,0.25); }
+
+  .settings-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(80,50,70,0.35);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(4px);
+  }
+
+  .settings-overlay.open { display: flex; }
+
+  .settings-panel {
+    background: var(--warm-white);
+    border-radius: 18px;
+    padding: 30px 34px;
+    width: 500px;
+    max-width: 94vw;
+    max-height: 85vh;
+    overflow-y: auto;
+    box-shadow: 0 24px 80px rgba(120,70,100,0.2);
+    border: 1px solid var(--border);
+  }
+
+  .settings-panel h2 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin-bottom: 22px;
+    color: var(--text);
+  }
+
+  .settings-section {
+    margin-bottom: 22px;
+  }
+
+  .settings-section h3 {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--text-light);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    margin-bottom: 10px;
+  }
+
+  .category-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .category-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    transition: all 0.15s;
+  }
+
+  .category-row:hover {
+    border-color: rgba(176,122,171,0.3);
+  }
+
+  .category-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .category-name {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .category-count {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+
+  .category-delete-btn {
+    padding: 5px 14px;
+    border-radius: 50px;
+    border: 1px solid var(--rose-light);
+    background: #fff;
+    color: var(--rose);
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.15s;
+  }
+
+  .category-delete-btn:hover { background: var(--rose-light); }
+
+  .settings-close {
+    padding: 10px 24px;
+    border-radius: 50px;
+    border: 1px solid var(--border);
+    background: #fff;
+    color: var(--text-light);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.15s;
+    margin-top: 6px;
+  }
+
+  .settings-close:hover { background: var(--blush); }
+
+  .settings-footer {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 16px;
+    border-top: 1px solid var(--border-light);
+  }
+
   /* ─── Responsive ─── */
   @media (max-width: 640px) {
     .main { padding: 16px; }
@@ -526,7 +673,27 @@
     <h1>Sally's Dashboard</h1>
     <p>Money Means &middot; Chief of Staff</p>
   </div>
-  <button class="add-btn" onclick="openModal()">+ New Task</button>
+  <div class="topbar-actions">
+    <button class="add-btn" onclick="openModal()">+ New Task</button>
+    <button class="settings-btn" onclick="openSettings()" title="Settings">&#9881;</button>
+  </div>
+</div>
+
+<div class="settings-overlay" id="settingsOverlay">
+  <div class="settings-panel">
+    <h2>Settings</h2>
+    <div class="settings-section">
+      <h3>Work Categories</h3>
+      <div class="category-list" id="workCategories"></div>
+    </div>
+    <div class="settings-section">
+      <h3>Personal Categories</h3>
+      <div class="category-list" id="personalCategories"></div>
+    </div>
+    <div class="settings-footer">
+      <button class="settings-close" onclick="closeSettings()">Close</button>
+    </div>
+  </div>
 </div>
 
 <div class="modal-overlay" id="modalOverlay">
@@ -964,7 +1131,84 @@ document.getElementById("modalOverlay").addEventListener("click", (e) => {
   if (e.target === document.getElementById("modalOverlay")) closeModal();
 });
 document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape") closeModal();
+  if (e.key === "Escape") { closeModal(); closeSettings(); }
+});
+
+// ─── SETTINGS ───────────────────────────────────────────────────
+function openSettings() {
+  renderSettings();
+  document.getElementById("settingsOverlay").classList.add("open");
+}
+
+function closeSettings() {
+  document.getElementById("settingsOverlay").classList.remove("open");
+}
+
+function renderSettings() {
+  ["Work", "Personal"].forEach(type => {
+    const containerId = type === "Work" ? "workCategories" : "personalCategories";
+    const container = document.getElementById(containerId);
+    const typeTasks = tasks.filter(t => (t.type || "Work") === type);
+    const cats = {};
+    typeTasks.forEach(t => { cats[t.area] = (cats[t.area] || 0) + 1; });
+    const sorted = Object.keys(cats).sort();
+
+    if (sorted.length === 0) {
+      container.innerHTML = '<div style="font-size:0.82rem;color:var(--text-muted);padding:8px 0;">No categories</div>';
+      return;
+    }
+
+    container.innerHTML = sorted.map(cat => {
+      const count = cats[cat];
+      return '<div class="category-row">' +
+        '<div class="category-info">' +
+          '<span class="category-name">' + escapeHtml(cat) + '</span>' +
+          '<span class="category-count">' + count + ' task' + (count !== 1 ? 's' : '') + '</span>' +
+        '</div>' +
+        '<button class="category-delete-btn" data-cat="' + escapeHtml(cat) + '" data-type="' + type + '">Delete</button>' +
+      '</div>';
+    }).join("");
+
+    container.querySelectorAll(".category-delete-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const cat = btn.getAttribute("data-cat");
+        const catType = btn.getAttribute("data-type");
+        deleteCategory(cat, catType);
+      });
+    });
+  });
+}
+
+function deleteCategory(cat, type) {
+  const affected = tasks.filter(t => t.area === cat && (t.type || "Work") === type);
+  if (affected.length === 0) return;
+
+  // Find other categories for this type to reassign to
+  const typeTasks = tasks.filter(t => (t.type || "Work") === type && t.area !== cat);
+  const otherCats = [...new Set(typeTasks.map(t => t.area))].sort();
+  const fallback = otherCats.length > 0 ? otherCats[0] : "Ongoing";
+
+  let moveTo = fallback;
+  if (otherCats.length > 0) {
+    moveTo = prompt(
+      'Delete "' + cat + '"? (' + affected.length + ' task' + (affected.length !== 1 ? 's' : '') + ' will move)\n\n' +
+      'Move tasks to which category?\n' + otherCats.join(', '),
+      fallback
+    );
+    if (moveTo === null) return;
+    if (!otherCats.includes(moveTo)) moveTo = fallback;
+  } else {
+    if (!confirm('Delete "' + cat + '"? ' + affected.length + ' task' + (affected.length !== 1 ? 's' : '') + ' will move to "Ongoing".')) return;
+  }
+
+  affected.forEach(t => { t.area = moveTo; });
+  renderSettings();
+  buildFilters();
+  render();
+}
+
+document.getElementById("settingsOverlay").addEventListener("click", (e) => {
+  if (e.target === document.getElementById("settingsOverlay")) closeSettings();
 });
 
 // ─── INIT ────────────────────────────────────────────────────────
