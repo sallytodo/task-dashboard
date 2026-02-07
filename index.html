@@ -1068,13 +1068,13 @@ const tasks = [
   { id: 37, name: "ASOS returns", area: "Ongoing", type: "Personal", energy: "Medium", status: "To Do", added: "7th Feb 2026", notes: "" },
   { id: 38, name: "Order ufh", area: "Ongoing", type: "Personal", energy: "Medium", status: "To Do", added: "7th Feb 2026", notes: "Category - house" },
   { id: 39, name: "Test", area: "Misc", type: "Work", energy: "Medium", status: "To Do", added: "7th Feb 2026", notes: "" },
-];
-
-// ─── INBOX DATA ─────────────────────────────────────────────────
-const inbox = [  { id: 41, name: "Put on washing", area: "Misc", type: "Work", energy: "Medium", status: "To Do", added: "7th Feb 2026", notes: "" },
+  { id: 41, name: "Put on washing", area: "Misc", type: "Work", energy: "Medium", status: "To Do", added: "7th Feb 2026", notes: "" },
   { id: 42, name: "Dishwasher", area: "Misc", type: "Work", energy: "Medium", status: "To Do", added: "7th Feb 2026", notes: "" },
   { id: 43, name: "Television", area: "Misc", type: "Personal", energy: "Medium", status: "To Do", added: "7th Feb 2026", notes: "" },
 ];
+
+// ─── INBOX DATA ─────────────────────────────────────────────────
+const inbox = [];
 
 // ─── STATE ───────────────────────────────────────────────────────
 let activeFilters = { status: new Set(["All"]), energy: new Set(["All"]), area: new Set(["All"]), type: new Set(["All"]) };
@@ -1627,6 +1627,7 @@ function renderInbox() {
 function approveInboxItem(idx) {
   const item = inbox[idx];
   if (!item) return;
+  const originalId = item.id;
   const maxId = Math.max(
     tasks.reduce((m, t) => Math.max(m, t.id), 0),
     inbox.reduce((m, t) => Math.max(m, t.id || 0), 0)
@@ -1637,12 +1638,12 @@ function approveInboxItem(idx) {
   renderInbox();
   buildFilters();
   render();
-  // Persist to disk if served via HTTP
+  // Persist to disk using the original ID (what's on disk)
   if (location.protocol !== "file:") {
     fetch("/api/approve-inbox", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id: item.id })
+      body: JSON.stringify({ id: originalId })
     }).catch(() => {});
   }
 }
