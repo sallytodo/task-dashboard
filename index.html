@@ -667,7 +667,19 @@ if (today.getDay() === 4) {
 // ─── BUILD FILTERS ───────────────────────────────────────────────
 function buildFilters() {
   const container = document.getElementById("filters");
-  const areas = [...new Set(tasks.map(t => t.area))].sort();
+  // Filter categories based on selected type
+  const typeFilter = activeFilters.type;
+  const filteredTasks = typeFilter.has("All") ? tasks : tasks.filter(t => typeFilter.has(t.type || "Work"));
+  const areas = [...new Set(filteredTasks.map(t => t.area))].sort();
+
+  // If selected categories no longer exist in filtered list, reset to All
+  if (!activeFilters.area.has("All")) {
+    const valid = new Set(areas);
+    for (const a of activeFilters.area) {
+      if (!valid.has(a)) activeFilters.area.delete(a);
+    }
+    if (activeFilters.area.size === 0) activeFilters.area.add("All");
+  }
 
   const groups = [
     { label: "Type", key: "type", options: ["All", "Work", "Personal"] },
