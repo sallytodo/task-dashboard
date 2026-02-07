@@ -1067,13 +1067,12 @@ const tasks = [
   { id: 36, name: "Talk to me", area: "Ongoing", type: "Work", energy: "Medium", status: "To Do", added: "7th Feb 2026", notes: "Behave yourself\nI don't know why it's not talking to me not to talk to me but anyway it's telling me instead send it" },
   { id: 37, name: "ASOS returns", area: "Ongoing", type: "Personal", energy: "Medium", status: "To Do", added: "7th Feb 2026", notes: "" },
   { id: 38, name: "Order ufh", area: "Ongoing", type: "Personal", energy: "Medium", status: "To Do", added: "7th Feb 2026", notes: "Category - house" },
+  { id: 39, name: "Test", area: "Misc", type: "Work", energy: "Medium", status: "To Do", added: "7th Feb 2026", notes: "" },
 ];
 
 // ─── INBOX DATA ─────────────────────────────────────────────────
-const inbox = [
-  { id: 39, name: "Test", area: "Misc", type: "Work", energy: "Medium", status: "To Do", added: "7th Feb 2026", notes: "" },
-  { id: 40, name: "Top up dinner money", area: "Misc", type: "Work", energy: "Medium", status: "To Do", added: "7th Feb 2026", notes: "" },
-  { id: 41, name: "Put on washing", area: "Misc", type: "Work", energy: "Medium", status: "To Do", added: "7th Feb 2026", notes: "" },
+const inbox = [  { id: 41, name: "Put on washing", area: "Misc", type: "Work", energy: "Medium", status: "To Do", added: "7th Feb 2026", notes: "" },
+  { id: 42, name: "Dishwasher", area: "Misc", type: "Work", energy: "Medium", status: "To Do", added: "7th Feb 2026", notes: "" },
 ];
 
 // ─── STATE ───────────────────────────────────────────────────────
@@ -1637,6 +1636,14 @@ function approveInboxItem(idx) {
   renderInbox();
   buildFilters();
   render();
+  // Persist to disk if served via HTTP
+  if (location.protocol !== "file:") {
+    fetch("/api/approve-inbox", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: item.id })
+    }).catch(() => {});
+  }
 }
 
 function dismissInboxItem(idx) {
@@ -1645,6 +1652,14 @@ function dismissInboxItem(idx) {
   if (confirm('Dismiss "' + item.name + '" from inbox?')) {
     inbox.splice(idx, 1);
     renderInbox();
+    // Persist to disk if served via HTTP
+    if (location.protocol !== "file:") {
+      fetch("/api/dismiss-inbox", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: item.id })
+      }).catch(() => {});
+    }
   }
 }
 
