@@ -655,7 +655,7 @@ const tasks = [
 ];
 
 // ─── STATE ───────────────────────────────────────────────────────
-let activeFilters = { status: "All", energy: "All", area: "All", type: "All" };
+let activeFilters = { status: new Set(["All"]), energy: new Set(["All"]), area: new Set(["All"]), type: new Set(["All"]) };
 let editingTaskId = null;
 
 // ─── THURSDAY CHECK ──────────────────────────────────────────────
@@ -688,10 +688,18 @@ function buildFilters() {
     fg.innerHTML = '<span class="filter-label">' + group.label + '</span>';
     group.options.forEach(opt => {
       const btn = document.createElement("button");
-      btn.className = "filter-btn" + (activeFilters[group.key] === opt ? " active" : "");
+      btn.className = "filter-btn" + (activeFilters[group.key].has(opt) ? " active" : "");
       btn.textContent = opt;
       btn.addEventListener("click", () => {
-        activeFilters[group.key] = opt;
+        const f = activeFilters[group.key];
+        if (opt === "All") {
+          f.clear();
+          f.add("All");
+        } else {
+          f.delete("All");
+          if (f.has(opt)) { f.delete(opt); } else { f.add(opt); }
+          if (f.size === 0) f.add("All");
+        }
         buildFilters();
         render();
       });
@@ -715,10 +723,10 @@ function render() {
   const isThursday = today.getDay() === 4;
 
   const filtered = tasks.filter(t => {
-    if (activeFilters.type !== "All" && (t.type || "Work") !== activeFilters.type) return false;
-    if (activeFilters.status !== "All" && t.status !== activeFilters.status) return false;
-    if (activeFilters.energy !== "All" && t.energy !== activeFilters.energy) return false;
-    if (activeFilters.area !== "All" && t.area !== activeFilters.area) return false;
+    if (!activeFilters.type.has("All") && !activeFilters.type.has(t.type || "Work")) return false;
+    if (!activeFilters.status.has("All") && !activeFilters.status.has(t.status)) return false;
+    if (!activeFilters.energy.has("All") && !activeFilters.energy.has(t.energy)) return false;
+    if (!activeFilters.area.has("All") && !activeFilters.area.has(t.area)) return false;
     return true;
   });
 
