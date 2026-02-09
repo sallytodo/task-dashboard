@@ -329,6 +329,14 @@
   .tag-energy-medium { background: var(--peach-light); color: #c07830; }
   .tag-energy-low { background: var(--sage-light); color: #4a8a6f; }
 
+  .tag-imp-high { background: #ede0f5; color: #6b3a8a; }
+  .tag-imp-medium { background: #f3eaf2; color: #8a5a9a; }
+  .tag-imp-low { background: #f8f3f8; color: #a88aab; }
+
+  .tag-urg-high { background: #dce8f5; color: #3a5a8a; }
+  .tag-urg-medium { background: #e4eff7; color: #4a7090; }
+  .tag-urg-low { background: #eef4f8; color: #7a9aab; }
+
   .tag-due { background: #fef5ea; color: #a06020; }
   .tag-recurring { background: var(--mauve-light); color: var(--mauve); }
   .tag-notes { background: var(--border-light); color: var(--text-light); }
@@ -993,6 +1001,32 @@
   .table-energy-dot.medium { background: var(--peach); }
   .table-energy-dot.low { background: var(--sage); }
 
+  .table-imp-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 6px;
+    vertical-align: middle;
+  }
+
+  .table-imp-dot.high { background: #7b3fa0; }
+  .table-imp-dot.medium { background: #a070b8; }
+  .table-imp-dot.low { background: #c4a8cc; }
+
+  .table-urg-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 6px;
+    vertical-align: middle;
+  }
+
+  .table-urg-dot.high { background: #3a6aaa; }
+  .table-urg-dot.medium { background: #5a90b0; }
+  .table-urg-dot.low { background: #8ab0c8; }
+
   .table-status-pill {
     padding: 3px 12px;
     border-radius: 50px;
@@ -1125,6 +1159,26 @@
         <input type="date" id="taskDue">
       </div>
     </div>
+    <div class="form-field-row">
+      <div class="form-field">
+        <label for="taskImportance">Importance</label>
+        <select id="taskImportance">
+          <option value="" selected>—</option>
+          <option value="High">High</option>
+          <option value="Medium">Medium</option>
+          <option value="Low">Low</option>
+        </select>
+      </div>
+      <div class="form-field">
+        <label for="taskUrgency">Urgency</label>
+        <select id="taskUrgency">
+          <option value="" selected>—</option>
+          <option value="High">High</option>
+          <option value="Medium">Medium</option>
+          <option value="Low">Low</option>
+        </select>
+      </div>
+    </div>
     <div class="form-check">
       <input type="checkbox" id="taskRecurring">
       <label for="taskRecurring">Recurring task</label>
@@ -1147,21 +1201,6 @@
   <strong>Thursday tasks:</strong> Invoice payments and Expenses are due today (every other Thursday for expenses).
 </div>
 
-<div class="progress-section">
-  <div class="progress-header">
-    <span>Progress</span>
-    <span id="progressText">0 / 0 done</span>
-  </div>
-  <div class="progress-bar">
-    <div class="progress-fill" id="progressFill" style="width: 0%"></div>
-  </div>
-  <div class="stats">
-    <div class="stat"><span class="stat-dot todo"></span><span id="statTodo">0 to do</span></div>
-    <div class="stat"><span class="stat-dot in-progress"></span><span id="statInProgress">0 in progress</span></div>
-    <div class="stat"><span class="stat-dot done"></span><span id="statDone">0 done</span></div>
-    <div class="stat"><span class="stat-dot waiting"></span><span id="statWaiting">0 waiting</span></div>
-  </div>
-</div>
 
 <div class="inbox-section hidden" id="inboxSection">
   <div class="inbox-header" onclick="toggleInboxCollapse()">
@@ -1233,10 +1272,15 @@ const inbox = [
   { id: 48, name: "Pay Ryan", area: "Misc", type: "Personal", energy: "Medium", status: "To Do", added: "9th Feb 2026", notes: "Sally Williams" },
   { id: 49, name: "Meeting with Swastha", area: "Misc", type: "Work", energy: "Medium", status: "To Do", added: "9th Feb 2026", notes: "Sally Williams" },
   { id: 50, name: "Make chilli", area: "Misc", type: "Work", energy: "Medium", status: "To Do", added: "9th Feb 2026", notes: "Sally Williams" },
+  { id: 51, name: "Send GDPR opt-in email to Money Hub list", area: "Misc", type: "Work", energy: "Medium", status: "To Do", added: "9th Feb 2026", notes: "Research options & requirements\n\nSally Williams" },
+  { id: 52, name: "Research EIS knowledge intensive", area: "Misc", type: "Work", energy: "Medium", status: "To Do", added: "9th Feb 2026", notes: "In preparation for Marlborough meeting. Check requirements and process for pre-approval\n\nSally Williams" },
+  { id: 53, name: "Create comprehensive acronym list", area: "Misc", type: "Work", energy: "Medium", status: "To Do", added: "9th Feb 2026", notes: "Refer to previous jargon file\n\nSally Williams" },
+  { id: 54, name: "Review off-topic evaluation", area: "Misc", type: "Work", energy: "Medium", status: "To Do", added: "9th Feb 2026", notes: "Check with Dan. Review & feedback to Frank\n\nSally Williams" },
+  { id: 55, name: "-   Review helpful evaluator criteria and sample failures", area: "Misc", type: "Work", energy: "Medium", status: "To Do", added: "9th Feb 2026", notes: "Sally Williams" },
 ];
 
 // ─── STATE ───────────────────────────────────────────────────────
-let activeFilters = { status: new Set(["All"]), energy: new Set(["All"]), area: new Set(["All"]), type: new Set(["All"]) };
+let activeFilters = { status: new Set(["To Do", "In Progress", "Waiting"]), energy: new Set(["All"]), area: new Set(["All"]), type: new Set(["All"]) };
 let editingTaskId = null;
 const customCategories = JSON.parse(localStorage.getItem("customCategories") || '{"Work":["Misc"],"Personal":["Misc"]}');
 let viewMode = "dashboard";
@@ -1391,7 +1435,7 @@ function parseDateForSort(dateStr) {
 // ─── SORT TASKS ──────────────────────────────────────────────────
 function sortTasks(list) {
   if (!sortColumn) return list;
-  const energyOrder = { "High": 0, "Medium": 1, "Low": 2, "": 3 };
+  const hmlOrder = { "High": 0, "Medium": 1, "Low": 2, "": 3 };
   const statusOrder = { "To Do": 0, "In Progress": 1, "Waiting": 2, "Done": 3 };
   const sorted = [...list];
   sorted.sort((a, b) => {
@@ -1401,8 +1445,16 @@ function sortTasks(list) {
       case "category": va = (a.area || "").toLowerCase(); vb = (b.area || "").toLowerCase(); break;
       case "type": va = (a.type || "Work"); vb = (b.type || "Work"); break;
       case "energy":
-        va = energyOrder[a.energy || ""] ?? 3;
-        vb = energyOrder[b.energy || ""] ?? 3;
+        va = hmlOrder[a.energy || ""] ?? 3;
+        vb = hmlOrder[b.energy || ""] ?? 3;
+        return sortDirection === "asc" ? va - vb : vb - va;
+      case "importance":
+        va = hmlOrder[a.importance || ""] ?? 3;
+        vb = hmlOrder[b.importance || ""] ?? 3;
+        return sortDirection === "asc" ? va - vb : vb - va;
+      case "urgency":
+        va = hmlOrder[a.urgency || ""] ?? 3;
+        vb = hmlOrder[b.urgency || ""] ?? 3;
         return sortDirection === "asc" ? va - vb : vb - va;
       case "status":
         va = statusOrder[a.status] ?? 4;
@@ -1437,21 +1489,6 @@ function handleColumnSort(col) {
 }
 
 // ─── RENDER ──────────────────────────────────────────────────────
-function renderStats() {
-  const todoCount = tasks.filter(t => t.status === "To Do").length;
-  const doneCount = tasks.filter(t => t.status === "Done").length;
-  const waitingCount = tasks.filter(t => t.status === "Waiting").length;
-  const inProgressCount = tasks.filter(t => t.status === "In Progress").length;
-  const total = tasks.length;
-  const pct = total > 0 ? Math.round((doneCount / total) * 100) : 0;
-
-  document.getElementById("progressFill").style.width = pct + "%";
-  document.getElementById("progressText").textContent = doneCount + " / " + total + " done (" + pct + "%)";
-  document.getElementById("statTodo").textContent = todoCount + " to do";
-  document.getElementById("statInProgress").textContent = inProgressCount + " in progress";
-  document.getElementById("statDone").textContent = doneCount + " done";
-  document.getElementById("statWaiting").textContent = waitingCount + " waiting";
-}
 
 function renderGrid(filtered) {
   const grid = document.getElementById("taskGrid");
@@ -1474,7 +1511,13 @@ function renderGrid(filtered) {
     let tags = '';
     tags += '<span class="tag tag-area">' + escapeHtml(t.area) + '</span>';
     if (t.energy) {
-      tags += '<span class="tag tag-energy-' + eLower + '">' + t.energy + '</span>';
+      tags += '<span class="tag tag-energy-' + eLower + '">\u26A1 ' + t.energy + '</span>';
+    }
+    if (t.importance) {
+      tags += '<span class="tag tag-imp-' + t.importance.toLowerCase() + '">! ' + t.importance + '</span>';
+    }
+    if (t.urgency) {
+      tags += '<span class="tag tag-urg-' + t.urgency.toLowerCase() + '">\u23F1 ' + t.urgency + '</span>';
     }
     if (t.due) {
       tags += '<span class="tag tag-due">' + escapeHtml(t.due) + '</span>';
@@ -1522,7 +1565,9 @@ function renderTable(filtered) {
     { key: "name", label: "Name" },
     { key: "category", label: "Category" },
     { key: "type", label: "Type" },
-    { key: "energy", label: "Energy" },
+    { key: "energy", label: "\u26A1 Energy" },
+    { key: "importance", label: "! Imp" },
+    { key: "urgency", label: "\u23F1 Urg" },
     { key: "status", label: "Status" },
     { key: "due", label: "Due" },
     { key: "added", label: "Added" },
@@ -1557,6 +1602,18 @@ function renderTable(filtered) {
     // Energy
     if (t.energy) {
       html += '<td><span class="table-energy-dot ' + eLower + '"></span>' + t.energy + '</td>';
+    } else {
+      html += '<td></td>';
+    }
+    // Importance
+    if (t.importance) {
+      html += '<td><span class="table-imp-dot ' + t.importance.toLowerCase() + '"></span>' + t.importance + '</td>';
+    } else {
+      html += '<td></td>';
+    }
+    // Urgency
+    if (t.urgency) {
+      html += '<td><span class="table-urg-dot ' + t.urgency.toLowerCase() + '"></span>' + t.urgency + '</td>';
     } else {
       html += '<td></td>';
     }
@@ -1598,7 +1655,6 @@ function renderTable(filtered) {
 }
 
 function render() {
-  renderStats();
   const filtered = getFilteredTasks();
   if (viewMode === "dashboard") {
     renderGrid(filtered);
@@ -1639,6 +1695,8 @@ function openModal() {
   populateAreaDropdown("Misc");
   document.getElementById("taskEnergy").value = "Medium";
   document.getElementById("taskStatus").value = "To Do";
+  document.getElementById("taskImportance").value = "";
+  document.getElementById("taskUrgency").value = "";
   document.getElementById("taskDue").value = "";
   document.getElementById("taskRecurring").checked = false;
   document.getElementById("taskNotes").value = "";
@@ -1658,6 +1716,8 @@ function openEditModal(id) {
   populateAreaDropdown(task.area);
   document.getElementById("taskEnergy").value = task.energy || "Medium";
   document.getElementById("taskStatus").value = task.status;
+  document.getElementById("taskImportance").value = task.importance || "";
+  document.getElementById("taskUrgency").value = task.urgency || "";
   document.getElementById("taskDue").value = parseDateToInput(task.due);
   document.getElementById("taskRecurring").checked = !!task.recurring;
   document.getElementById("taskNotes").value = task.notes || "";
@@ -1723,6 +1783,8 @@ function saveTask() {
 
   const type = document.getElementById("taskType").value;
   const energy = document.getElementById("taskEnergy").value;
+  const importance = document.getElementById("taskImportance").value;
+  const urgency = document.getElementById("taskUrgency").value;
   const status = document.getElementById("taskStatus").value;
   const due = formatDateValue(document.getElementById("taskDue").value);
   const recurring = document.getElementById("taskRecurring").checked;
@@ -1738,7 +1800,7 @@ function saveTask() {
       tasks.reduce((m, t) => Math.max(m, t.id), 0),
       inbox.reduce((m, t) => Math.max(m, t.id || 0), 0)
     );
-    tasks.push({ id: maxId+1, name, area, type, energy, status, due, added: inbox[editingInboxIdx].added || formatTodayDate(), recurring, notes });
+    tasks.push({ id: maxId+1, name, area, type, energy, importance, urgency, status, due, added: inbox[editingInboxIdx].added || formatTodayDate(), recurring, notes });
     inbox.splice(editingInboxIdx, 1);
     editingInboxIdx = null;
     saveTasks(); saveInbox();
@@ -1747,6 +1809,7 @@ function saveTask() {
     const task = tasks.find(t => t.id === editingTaskId);
     if (task) {
       task.name = name; task.area = area; task.type = type; task.energy = energy;
+      task.importance = importance; task.urgency = urgency;
       task.status = status; task.due = due; task.recurring = recurring; task.notes = notes;
     }
     saveTasks();
@@ -1756,7 +1819,7 @@ function saveTask() {
       tasks.reduce((m, t) => Math.max(m, t.id), 0),
       inbox.reduce((m, t) => Math.max(m, t.id || 0), 0)
     );
-    tasks.push({ id: maxId+1, name, area, type, energy, status, due, added: formatTodayDate(), recurring, notes });
+    tasks.push({ id: maxId+1, name, area, type, energy, importance, urgency, status, due, added: formatTodayDate(), recurring, notes });
     saveTasks();
     closeModal(); buildFilters(); render();
   }
@@ -2083,6 +2146,8 @@ function openInboxEditModal(idx) {
   document.getElementById("taskType").value = item.type || "Work";
   populateAreaDropdown(item.area);
   document.getElementById("taskEnergy").value = item.energy || "Medium";
+  document.getElementById("taskImportance").value = item.importance || "";
+  document.getElementById("taskUrgency").value = item.urgency || "";
   document.getElementById("taskStatus").value = item.status || "To Do";
   document.getElementById("taskDue").value = parseDateToInput(item.due);
   document.getElementById("taskRecurring").checked = !!item.recurring;
