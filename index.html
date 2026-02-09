@@ -1230,6 +1230,7 @@ const tasks = [
 // ─── INBOX DATA ─────────────────────────────────────────────────
 const inbox = [
   { id: 47, name: "Buy Ben a present", area: "Misc", type: "Personal", energy: "Medium", status: "To Do", added: "7th Feb 2026", notes: "" },
+  { id: 48, name: "Pay Ryan", area: "Misc", type: "Personal", energy: "Medium", status: "To Do", added: "9th Feb 2026", notes: "Sally Williams" },
 ];
 
 // ─── STATE ───────────────────────────────────────────────────────
@@ -1240,9 +1241,47 @@ let viewMode = "dashboard";
 let sortColumn = null;
 let sortDirection = "asc";
 
-// Apply persisted task area overrides (from category deletions)
-const _areaOverrides = JSON.parse(localStorage.getItem("taskAreaOverrides") || "{}");
-tasks.forEach(t => { if (_areaOverrides[t.id]) t.area = _areaOverrides[t.id]; });
+// ─── PERSIST TASKS & INBOX ───────────────────────────────────────
+function saveTasks() { localStorage.setItem("savedTasks", JSON.stringify(tasks)); }
+function saveInbox() { localStorage.setItem("savedInbox", JSON.stringify(inbox)); }
+
+(function loadSavedData() {
+  const deletedIds = new Set(JSON.parse(localStorage.getItem("deletedTaskIds") || "[]"));
+  const dismissedIds = new Set(JSON.parse(localStorage.getItem("dismissedInboxIds") || "[]"));
+
+  // Tasks: localStorage wins, merge in new from hardcoded array
+  const savedRaw = localStorage.getItem("savedTasks");
+  if (savedRaw) {
+    const saved = JSON.parse(savedRaw);
+    const savedIds = new Set(saved.map(t => t.id));
+    const merged = [...saved];
+    tasks.forEach(t => { if (!savedIds.has(t.id) && !deletedIds.has(t.id)) merged.push(t); });
+    tasks.length = 0;
+    merged.forEach(t => tasks.push(t));
+  }
+
+  // Migrate old area overrides (one-time, applies on top then cleans up)
+  const oldOverrides = localStorage.getItem("taskAreaOverrides");
+  if (oldOverrides) {
+    const overrides = JSON.parse(oldOverrides);
+    tasks.forEach(t => { if (overrides[t.id]) t.area = overrides[t.id]; });
+    localStorage.removeItem("taskAreaOverrides");
+  }
+
+  // Inbox: same merge
+  const savedInboxRaw = localStorage.getItem("savedInbox");
+  if (savedInboxRaw) {
+    const saved = JSON.parse(savedInboxRaw);
+    const savedIds = new Set(saved.map(t => t.id));
+    const merged = [...saved];
+    inbox.forEach(t => { if (!savedIds.has(t.id) && !dismissedIds.has(t.id)) merged.push(t); });
+    inbox.length = 0;
+    merged.forEach(t => inbox.push(t));
+  }
+
+  saveTasks();
+  saveInbox();
+})();
 
 // ─── THURSDAY CHECK ──────────────────────────────────────────────
 const today = new Date();
@@ -1312,6 +1351,7 @@ const statusCycle = ["To Do", "In Progress", "Done", "Waiting"];
 function cycleStatus(task) {
   const idx = statusCycle.indexOf(task.status);
   task.status = statusCycle[(idx + 1) % statusCycle.length];
+  saveTasks();
   render();
 }
 
@@ -1695,6 +1735,7 @@ function saveTask() {
     tasks.push({ id: maxId+1, name, area, type, energy, status, due, added: inbox[editingInboxIdx].added || formatTodayDate(), recurring, notes });
     inbox.splice(editingInboxIdx, 1);
     editingInboxIdx = null;
+    saveTasks(); saveInbox();
     closeModal(); buildFilters(); render(); renderInbox();
   } else if (editingTaskId !== null) {
     const task = tasks.find(t => t.id === editingTaskId);
@@ -1702,6 +1743,7 @@ function saveTask() {
       task.name = name; task.area = area; task.type = type; task.energy = energy;
       task.status = status; task.due = due; task.recurring = recurring; task.notes = notes;
     }
+    saveTasks();
     closeModal(); buildFilters(); render();
   } else {
     const maxId = Math.max(
@@ -1709,6 +1751,7 @@ function saveTask() {
       inbox.reduce((m, t) => Math.max(m, t.id || 0), 0)
     );
     tasks.push({ id: maxId+1, name, area, type, energy, status, due, added: formatTodayDate(), recurring, notes });
+    saveTasks();
     closeModal(); buildFilters(); render();
   }
 }
@@ -1717,8 +1760,12 @@ function deleteTask() {
   if (editingInboxIdx !== null) {
     const item = inbox[editingInboxIdx];
     if (item && confirm('Dismiss "' + item.name + '" from inbox?')) {
+      const dismissed = JSON.parse(localStorage.getItem("dismissedInboxIds") || "[]");
+      if (item.id) dismissed.push(item.id);
+      localStorage.setItem("dismissedInboxIds", JSON.stringify(dismissed));
       inbox.splice(editingInboxIdx, 1);
       editingInboxIdx = null;
+      saveInbox();
       closeModal(); renderInbox();
     }
     return;
@@ -1726,7 +1773,11 @@ function deleteTask() {
   if (editingTaskId === null) return;
   const task = tasks.find(t => t.id === editingTaskId);
   if (task && confirm('Delete "' + task.name + '"?')) {
+    const deleted = JSON.parse(localStorage.getItem("deletedTaskIds") || "[]");
+    deleted.push(task.id);
+    localStorage.setItem("deletedTaskIds", JSON.stringify(deleted));
     tasks.splice(tasks.indexOf(task), 1);
+    saveTasks();
     closeModal(); buildFilters(); render();
   }
 }
@@ -1820,11 +1871,8 @@ function deleteCategory(cat, type) {
       if (!confirm('Delete "' + cat + '"? ' + affected.length + ' task' + (affected.length !== 1 ? 's' : '') + ' will move to "Misc".')) return;
     }
 
-    affected.forEach(t => {
-      t.area = moveTo;
-      _areaOverrides[t.id] = moveTo;
-    });
-    localStorage.setItem("taskAreaOverrides", JSON.stringify(_areaOverrides));
+    affected.forEach(t => { t.area = moveTo; });
+    saveTasks();
   } else {
     if (!confirm('Delete empty category "' + cat + '"?')) return;
   }
@@ -1978,6 +2026,7 @@ function approveInboxItem(idx) {
   item.id = maxId + 1;
   tasks.push(item);
   inbox.splice(idx, 1);
+  saveTasks(); saveInbox();
   renderInbox();
   buildFilters();
   render();
@@ -1995,7 +2044,11 @@ function dismissInboxItem(idx) {
   const item = inbox[idx];
   if (!item) return;
   if (confirm('Dismiss "' + item.name + '" from inbox?')) {
+    const dismissed = JSON.parse(localStorage.getItem("dismissedInboxIds") || "[]");
+    if (item.id) dismissed.push(item.id);
+    localStorage.setItem("dismissedInboxIds", JSON.stringify(dismissed));
     inbox.splice(idx, 1);
+    saveInbox();
     renderInbox();
     // Persist to disk if served via HTTP
     if (location.protocol !== "file:") {
