@@ -1232,6 +1232,7 @@ const inbox = [
   { id: 47, name: "Buy Ben a present", area: "Misc", type: "Personal", energy: "Medium", status: "To Do", added: "7th Feb 2026", notes: "" },
   { id: 48, name: "Pay Ryan", area: "Misc", type: "Personal", energy: "Medium", status: "To Do", added: "9th Feb 2026", notes: "Sally Williams" },
   { id: 49, name: "Meeting with Swastha", area: "Misc", type: "Work", energy: "Medium", status: "To Do", added: "9th Feb 2026", notes: "Sally Williams" },
+  { id: 50, name: "Make chilli", area: "Misc", type: "Work", energy: "Medium", status: "To Do", added: "9th Feb 2026", notes: "Sally Williams" },
 ];
 
 // ─── STATE ───────────────────────────────────────────────────────
@@ -1729,6 +1730,10 @@ function saveTask() {
 
   if (editingInboxIdx !== null) {
     // Approving from inbox with edits
+    const origId = inbox[editingInboxIdx].id;
+    const dismissed = JSON.parse(localStorage.getItem("dismissedInboxIds") || "[]");
+    if (origId) dismissed.push(origId);
+    localStorage.setItem("dismissedInboxIds", JSON.stringify(dismissed));
     const maxId = Math.max(
       tasks.reduce((m, t) => Math.max(m, t.id), 0),
       inbox.reduce((m, t) => Math.max(m, t.id || 0), 0)
@@ -2024,6 +2029,9 @@ function approveInboxItem(idx) {
     tasks.reduce((m, t) => Math.max(m, t.id), 0),
     inbox.reduce((m, t) => Math.max(m, t.id || 0), 0)
   );
+  const dismissed = JSON.parse(localStorage.getItem("dismissedInboxIds") || "[]");
+  if (originalId) dismissed.push(originalId);
+  localStorage.setItem("dismissedInboxIds", JSON.stringify(dismissed));
   item.id = maxId + 1;
   tasks.push(item);
   inbox.splice(idx, 1);
